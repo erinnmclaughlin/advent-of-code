@@ -6,14 +6,13 @@ Write-Host ""
 Write-Host "==============================="
 Write-Host " Running Advent of Code Tests "
 Write-Host "==============================="
-Write-Host ""
 
 $repoRoot = Resolve-Path $PSScriptRoot
 
 # -----------------------------
 # C# Tests
 # -----------------------------
-$csharpTests = Join-Path $repoRoot "tests/AdventOfCode.CSharp.Tests/AdventOfCode.CSharp.Tests.csproj"
+$csharpTests = Join-Path $repoRoot "tests/csharp/AdventOfCode.CSharp.Tests.csproj"
 
 if (Test-Path $csharpTests) {
     Write-Host ""
@@ -27,7 +26,7 @@ if (Test-Path $csharpTests) {
 # -----------------------------
 # F# Tests
 # -----------------------------
-$fsharpTests = Join-Path $repoRoot "tests/AdventOfCode.FSharp.Tests/AdventOfCode.FSharp.Tests.fsproj"
+$fsharpTests = Join-Path $repoRoot "tests/fsharp/AdventOfCode.FSharp.Tests.fsproj"
 
 if (Test-Path $fsharpTests) {
     Write-Host ""

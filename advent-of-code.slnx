@@ -7,10 +7,10 @@
   </Folder>
   <Folder Name="/csharp/">
     <Project Path="csharp/AdventOfCode.CSharp.csproj" />
-    <Project Path="tests/AdventOfCode.CSharp.Tests/AdventOfCode.CSharp.Tests.csproj" Id="aa30d345-e626-4245-9dd7-8e02f2fc4efd" />
+    <Project Path="tests/csharp/AdventOfCode.CSharp.Tests.csproj" Id="aa30d345-e626-4245-9dd7-8e02f2fc4efd" />
   </Folder>
   <Folder Name="/fsharp/">
     <Project Path="fsharp/AdventOfCode.FSharp.fsproj" />
-    <Project Path="tests/AdventOfCode.FSharp.Tests/AdventOfCode.FSharp.Tests.fsproj" Id="69832556-c9a9-475b-bc8d-6fbdd240bdb6" />
+    <Project Path="tests/fsharp/AdventOfCode.FSharp.Tests.fsproj" Id="69832556-c9a9-475b-bc8d-6fbdd240bdb6" />
   </Folder>
 </Solution>
