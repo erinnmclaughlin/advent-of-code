@@ -1,4 +1,4 @@
-namespace AdventOfCode.FSharp
+namespace AdventOfCode
 
 type IAdventDay =
     abstract member Year : int

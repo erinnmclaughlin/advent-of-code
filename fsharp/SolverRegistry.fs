@@ -1,4 +1,4 @@
-namespace AdventOfCode.FSharp
+namespace AdventOfCode
 
 open System
 

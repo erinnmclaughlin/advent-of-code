@@ -130,7 +130,7 @@ function Invoke-CSharp {
         [bool] $RunningAll
     )
 
-    $csProject = Join-Path $RepoRoot "csharp/AdventOfCode.csproj"
+    $csProject = Join-Path $RepoRoot "csharp/AdventOfCode.CSharp.csproj"
 
     if (-not (Test-Path $csProject)) {
         if ($RunningAll) {
@@ -159,7 +159,7 @@ function Invoke-FSharp {
         [bool] $RunningAll
     )
 
-    $fsProject = Join-Path $RepoRoot "fsharp/AdventOfCode.fsproj"
+    $fsProject = Join-Path $RepoRoot "fsharp/AdventOfCode.FSharp.fsproj"
 
     if (-not (Test-Path $fsProject)) {
         if ($RunningAll) {

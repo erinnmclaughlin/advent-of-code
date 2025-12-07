@@ -1,5 +1,5 @@
 ﻿open System
-open AdventOfCode.FSharp
+open AdventOfCode
 
 [<EntryPoint>]
 let main argv =

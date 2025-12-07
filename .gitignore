@@ -1,9 +1,9 @@
 bin/
 obj/
-inputs/
-.vs/
-.vscode/
 *.user
+
+# AOC
+inputs/
 
 # Python bytecode
 __pycache__/
@@ -15,3 +15,12 @@ __pycache__/
 python/.venv/
 .venv/
 venv/
+
+# Rider
+.idea/
+
+# Visual Studio
+.vs/
+
+# Visual Studio Code
+.vscode/

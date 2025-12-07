@@ -1,6 +1,6 @@
-namespace AdventOfCode.FSharp.Y2025
+namespace AdventOfCode.Y2025
 
-open AdventOfCode.FSharp
+open AdventOfCode
 open System
 
 type Day01() =
