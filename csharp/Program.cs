@@ -33,7 +33,7 @@ if (string.IsNullOrWhiteSpace(input))
 }
 
 // Solve
-var (part1, part2) = solver.Solve(input);
+var (part1, part2) = solver.Solve(input.Trim());
 
 // Output (AoC-style)
 Console.WriteLine($"Part 1: {part1}");

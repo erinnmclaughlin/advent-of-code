@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+  
+    <Compile Include="IAdventDay.fs" />
+    <Compile Include="SolverRegistry.fs" />
+
+    <Compile Include="Y2025\Day01.fs" />
+
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+</Project>

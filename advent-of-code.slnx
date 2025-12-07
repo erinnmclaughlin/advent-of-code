@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/csharp/">
+    <Project Path="csharp/AdventOfCode.csproj" />
+  </Folder>
+  <Folder Name="/fsharp/">
+    <Project Path="fsharp/AdventOfCode.fsproj" />
+  </Folder>
+</Solution>

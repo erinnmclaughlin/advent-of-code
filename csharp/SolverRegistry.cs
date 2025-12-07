@@ -6,13 +6,13 @@ public static class SolverRegistry
 
     static SolverRegistry()
     {
-        _solvers =
-            typeof(Program)
-                .Assembly
-                .GetTypes()
-                .Where(t => !t.IsAbstract && typeof(IAdventDay).IsAssignableFrom(t))
-                .Select(t => (IAdventDay)Activator.CreateInstance(t)!)
-                .ToDictionary(s => (s.Year, s.Day));
+        _solvers = AppDomain
+            .CurrentDomain
+            .GetAssemblies()
+            .SelectMany(asm => asm.GetTypes())
+            .Where(t => !t.IsAbstract && typeof(IAdventDay).IsAssignableFrom(t))
+            .Select(t => (IAdventDay)Activator.CreateInstance(t)!)
+            .ToDictionary(s => (s.Year, s.Day));
     }
 
     public static IAdventDay Get(int year, int day) =>

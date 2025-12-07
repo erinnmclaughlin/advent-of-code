@@ -44,9 +44,6 @@ $repoRoot = Resolve-Path (Join-Path $PSScriptRoot ".")
 $inputDir = Join-Path $repoRoot "inputs/$Year"
 $inputFile = Join-Path $inputDir "day$dayPadded.txt"
 
-# Single C# project path
-$csharpProject = Join-Path $repoRoot "csharp/AdventOfCode.csproj"
-
 # ----------------------------
 # AoC input download helper
 # ----------------------------
@@ -115,16 +112,23 @@ if (-not (Test-Path $inputFile)) {
 switch ($Lang.ToLower()) {
 
     "csharp" {
-        if (-not (Test-Path $csharpProject)) {
-            Write-Error "C# project not found: $csharpProject"
-            exit 1
-        }
+        
+        $csProject = Join-Path $repoRoot "csharp/AdventOfCode.csproj"
 
         Get-Content $inputFile -Raw |
             dotnet run `
-                --project $csharpProject `
+                --project $csProject `
                 -- $Year $Day
-            }
+    }
+
+    "fsharp" {
+        $fsProject = Join-Path $repoRoot "fsharp/AdventOfCode.fsproj"
+
+        Get-Content $inputFile -Raw |
+            dotnet run `
+                --project $fsProject `
+                -- $Year $Day
+    }
 
     default {
         Write-Error "Unknown language: $Lang"
