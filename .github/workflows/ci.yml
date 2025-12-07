@@ -29,9 +29,20 @@ jobs:
       - name: Install Python test dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pytest
+          python -m pip install pytest pytest-cov
 
       # --- Run all tests ---
       - name: Run all tests (C#, F#, Python)
         shell: pwsh
-        run: ./test.ps1
+        run: ./run-tests.ps1
+
+      # --- Upload coverage to Codecov ---
+      - name: Upload coverage reports to Codecov
+        if: success()
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: |
+            tests/**/coverage.cobertura.xml
+            python/coverage.xml
+          fail_ci_if_error: true

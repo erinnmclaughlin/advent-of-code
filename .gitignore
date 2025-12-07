@@ -17,6 +17,11 @@ python/.venv/
 .venv/
 venv/
 
+# Tests
+.coverage
+coverage.xml
+TestResults/
+
 # Rider
 .idea/
 

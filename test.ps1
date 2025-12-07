@@ -18,7 +18,8 @@ $csharpTests = Join-Path $repoRoot "tests/AdventOfCode.CSharp.Tests/AdventOfCode
 if (Test-Path $csharpTests) {
     Write-Host ""
     Write-Host ">>> Running C# tests"
-    dotnet test $csharpTests
+    dotnet test $csharpTests `
+        --collect:"XPlat Code Coverage"
 } else {
     Write-Warning "C# tests not found, skipping"
 }
@@ -31,7 +32,8 @@ $fsharpTests = Join-Path $repoRoot "tests/AdventOfCode.FSharp.Tests/AdventOfCode
 if (Test-Path $fsharpTests) {
     Write-Host ""
     Write-Host ">>> Running F# tests"
-    dotnet test $fsharpTests
+    dotnet test $fsharpTests `
+        --collect:"XPlat Code Coverage"
 } else {
     Write-Warning "F# tests not found, skipping"
 }
@@ -42,14 +44,19 @@ if (Test-Path $fsharpTests) {
 $pythonRoot = Join-Path $repoRoot "python"
 $pytestPath = Join-Path $repoRoot "tests/python"
 
-if ((Test-Path $pythonRoot) -and (Test-Path $pytestPath)) {
+$hasPython = Test-Path $pythonRoot
+$hasPyTests = Test-Path $pytestPath
+
+if ($hasPython -and $hasPyTests) {
     Write-Host ""
     Write-Host ">>> Running Python tests"
 
     Push-Location $pythonRoot
     try {
-        # Prefer invoking pytest via python -m to avoid PATH issues
-        python -m pytest ../tests/python
+        python -m pytest ../tests/python `
+          --cov=. `
+          --cov-report=xml `
+          --cov-report=term
     }
     finally {
         Pop-Location
