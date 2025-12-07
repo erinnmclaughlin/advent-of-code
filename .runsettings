@@ -17,6 +17,7 @@
             **/Program.cs
             **/SolverRegistry.cs
             **/IAdventDay.cs
+            **/AdventDaySolution.cs
             **/Program.fs
             **/SolverRegistry.fs
             **/IAdventDay.fs

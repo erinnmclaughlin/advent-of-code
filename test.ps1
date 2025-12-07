@@ -19,7 +19,7 @@ if (Test-Path $csharpTests) {
     Write-Host ">>> Running C# tests"
     dotnet test $csharpTests `
         --collect:"XPlat Code Coverage" `
-        --settings ./coverlet.runsettings
+        --settings ./.runsettings
 } else {
     Write-Warning "C# tests not found, skipping"
 }
@@ -34,7 +34,7 @@ if (Test-Path $fsharpTests) {
     Write-Host ">>> Running F# tests"
     dotnet test $fsharpTests `
         --collect:"XPlat Code Coverage" `
-        --settings ./coverlet.runsettings
+        --settings ./.runsettings
 } else {
     Write-Warning "F# tests not found, skipping"
 }
