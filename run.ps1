@@ -7,7 +7,7 @@ param(
     [Parameter(Mandatory = $true)]
     [int] $Day,
 
-    [Parameter(Mandatory = $true)]
+    # If omitted or empty, we'll run all languages that exist (csharp, fsharp, python)
     [string] $Lang,
 
     # Force a fresh download of the input
@@ -60,7 +60,7 @@ function Get-AocInput {
 Advent of Code session cookie not found.
 
 Set it once with:
-  pwsh ./scripts/run.ps1 -SetSessionCookie "<your-cookie>" ...
+  pwsh ./run.ps1 -SetSessionCookie "<your-cookie>" ...
 
 Or manually set AOC_SESSION in your environment.
 "@
@@ -107,60 +107,127 @@ if (-not (Test-Path $inputFile)) {
 }
 
 # ----------------------------
-# Run selected language
+# Determine which languages to run
 # ----------------------------
-switch ($Lang.ToLower()) {
+$runningAll = [string]::IsNullOrWhiteSpace($Lang)
 
-    "csharp" {
-        
-        $csProject = Join-Path $repoRoot "csharp/AdventOfCode.csproj"
+if ($runningAll) {
+    # Default: attempt all three
+    $languagesToRun = @("csharp", "fsharp", "python")
+} else {
+    $languagesToRun = @($Lang.ToLower())
+}
 
-        if (-not (Test-Path $csProject)) {
+# ----------------------------
+# Helpers for per-language execution
+# ----------------------------
+function Invoke-CSharp {
+    param(
+        [string] $RepoRoot,
+        [string] $InputFile,
+        [int] $Year,
+        [int] $Day,
+        [bool] $RunningAll
+    )
+
+    $csProject = Join-Path $RepoRoot "csharp/AdventOfCode.csproj"
+
+    if (-not (Test-Path $csProject)) {
+        if ($RunningAll) {
+            Write-Warning "Skipping C# – project not found: $csProject"
+            return
+        } else {
             Write-Error "C# project not found: $csProject"
             exit 1
         }
-
-        Get-Content $inputFile -Raw |
-            dotnet run `
-                --project $csProject `
-                -- $Year $Day
     }
 
-    "fsharp" {
-        $fsProject = Join-Path $repoRoot "fsharp/AdventOfCode.fsproj"
+    Write-Host ""
+    Write-Host "=== C# ($Year Day $Day) ==="
+    Get-Content $InputFile -Raw |
+        dotnet run `
+            --project $csProject `
+            -- $Year $Day
+}
 
-        if (-not (Test-Path $fsProject)) {
+function Invoke-FSharp {
+    param(
+        [string] $RepoRoot,
+        [string] $InputFile,
+        [int] $Year,
+        [int] $Day,
+        [bool] $RunningAll
+    )
+
+    $fsProject = Join-Path $RepoRoot "fsharp/AdventOfCode.fsproj"
+
+    if (-not (Test-Path $fsProject)) {
+        if ($RunningAll) {
+            Write-Warning "Skipping F# – project not found: $fsProject"
+            return
+        } else {
             Write-Error "F# project not found: $fsProject"
             exit 1
         }
-
-        Get-Content $inputFile -Raw |
-            dotnet run `
-                --project $fsProject `
-                -- $Year $Day
     }
 
-    "python" {
-        $pythonRoot = Join-Path $repoRoot "python"
+    Write-Host ""
+    Write-Host "=== F# ($Year Day $Day) ==="
+    Get-Content $InputFile -Raw |
+        dotnet run `
+            --project $fsProject `
+            -- $Year $Day
+}
 
-        if (-not (Test-Path $pythonRoot)) {
+function Invoke-Python {
+    param(
+        [string] $RepoRoot,
+        [string] $InputFile,
+        [int] $Year,
+        [int] $Day,
+        [bool] $RunningAll
+    )
+
+    $pythonRoot = Join-Path $RepoRoot "python"
+
+    if (-not (Test-Path $pythonRoot)) {
+        if ($RunningAll) {
+            Write-Warning "Skipping Python – folder not found: $pythonRoot"
+            return
+        } else {
             Write-Error "Python folder not found: $pythonRoot"
             exit 1
         }
-
-        Push-Location $pythonRoot
-        try {
-            Get-Content $inputFile -Raw |
-                python -m advent_of_code.cli $Year $Day
-        }
-        finally {
-            Pop-Location
-        }
     }
 
+    Write-Host ""
+    Write-Host "=== Python ($Year Day $Day) ==="
 
-    default {
-        Write-Error "Unknown language: $Lang"
-        exit 1
+    Push-Location $pythonRoot
+    try {
+        Get-Content $InputFile -Raw |
+            python -m advent_of_code.cli $Year $Day
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+# ----------------------------
+# Run one or more languages
+# ----------------------------
+foreach ($language in $languagesToRun) {
+    switch ($language) {
+        "csharp" { Invoke-CSharp -RepoRoot $repoRoot -InputFile $inputFile -Year $Year -Day $Day -RunningAll $runningAll }
+        "fsharp" { Invoke-FSharp -RepoRoot $repoRoot -InputFile $inputFile -Year $Year -Day $Day -RunningAll $runningAll }
+        "python" { Invoke-Python -RepoRoot $repoRoot -InputFile $inputFile -Year $Year -Day $Day -RunningAll $runningAll }
+        default {
+            if ($runningAll) {
+                Write-Warning "Unknown language in list: $language"
+            } else {
+                Write-Error "Unknown language: $language"
+                exit 1
+            }
+        }
     }
 }
