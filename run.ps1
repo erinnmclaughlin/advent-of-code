@@ -115,6 +115,11 @@ switch ($Lang.ToLower()) {
         
         $csProject = Join-Path $repoRoot "csharp/AdventOfCode.csproj"
 
+        if (-not (Test-Path $csProject)) {
+            Write-Error "C# project not found: $csProject"
+            exit 1
+        }
+
         Get-Content $inputFile -Raw |
             dotnet run `
                 --project $csProject `
@@ -124,11 +129,35 @@ switch ($Lang.ToLower()) {
     "fsharp" {
         $fsProject = Join-Path $repoRoot "fsharp/AdventOfCode.fsproj"
 
+        if (-not (Test-Path $fsProject)) {
+            Write-Error "F# project not found: $fsProject"
+            exit 1
+        }
+
         Get-Content $inputFile -Raw |
             dotnet run `
                 --project $fsProject `
                 -- $Year $Day
     }
+
+    "python" {
+        $pythonRoot = Join-Path $repoRoot "python"
+
+        if (-not (Test-Path $pythonRoot)) {
+            Write-Error "Python folder not found: $pythonRoot"
+            exit 1
+        }
+
+        Push-Location $pythonRoot
+        try {
+            Get-Content $inputFile -Raw |
+                python -m advent_of_code.cli $Year $Day
+        }
+        finally {
+            Pop-Location
+        }
+    }
+
 
     default {
         Write-Error "Unknown language: $Lang"

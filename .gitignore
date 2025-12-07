@@ -4,3 +4,14 @@ inputs/
 .vs/
 .vscode/
 *.user
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python virtual environments
+python/.venv/
+.venv/
+venv/
