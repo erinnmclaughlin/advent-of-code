@@ -34,7 +34,7 @@ jobs:
       # --- Run all tests ---
       - name: Run all tests (C#, F#, Python)
         shell: pwsh
-        run: ./run-tests.ps1
+        run: ./test.ps1
 
       # --- Upload coverage to Codecov ---
       - name: Upload coverage reports to Codecov
