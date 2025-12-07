@@ -18,7 +18,8 @@ if (Test-Path $csharpTests) {
     Write-Host ""
     Write-Host ">>> Running C# tests"
     dotnet test $csharpTests `
-        --collect:"XPlat Code Coverage"
+        --collect:"XPlat Code Coverage" `
+        --settings ./coverlet.runsettings
 } else {
     Write-Warning "C# tests not found, skipping"
 }
@@ -32,7 +33,8 @@ if (Test-Path $fsharpTests) {
     Write-Host ""
     Write-Host ">>> Running F# tests"
     dotnet test $fsharpTests `
-        --collect:"XPlat Code Coverage"
+        --collect:"XPlat Code Coverage" `
+        --settings ./coverlet.runsettings
 } else {
     Write-Warning "F# tests not found, skipping"
 }
@@ -53,9 +55,9 @@ if ($hasPython -and $hasPyTests) {
     Push-Location $pythonRoot
     try {
         python -m pytest ../tests/python `
-          --cov=. `
-          --cov-report=xml `
-          --cov-report=term
+            --cov=. `
+            --cov-report=xml `
+            --cov-report=term
     }
     finally {
         Pop-Location

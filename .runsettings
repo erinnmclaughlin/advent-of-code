@@ -1,0 +1,27 @@
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+
+          <!-- Restrict to main assemblies -->
+          <Include>
+            <ModulePath>.*AdventOfCode\.dll$</ModulePath>
+            <ModulePath>.*AdventOfCode\.FSharp\.dll$</ModulePath>
+          </Include>
+
+          <!-- Exclude glue files -->
+          <ExcludeByFile>
+            **/Program.cs
+            **/SolverRegistry.cs
+            **/IAdventDay.cs
+            **/Program.fs
+            **/SolverRegistry.fs
+            **/IAdventDay.fs
+          </ExcludeByFile>
+          
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
