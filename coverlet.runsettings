@@ -9,8 +9,8 @@
           <Include>
             <ModulePath>.*AdventOfCode\.dll$</ModulePath>
             <ModulePath>.*AdventOfCode\.FSharp\.dll$</ModulePath>
-          </Include
-          >-->
+          </Include>
+          -->
 
           <!-- Exclude glue files -->
           <ExcludeByFile>
