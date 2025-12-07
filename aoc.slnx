@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/.scripts/">
     <File Path="run.ps1" />
+    <File Path="test.ps1" />
   </Folder>
   <Folder Name="/csharp/">
     <Project Path="csharp/AdventOfCode.CSharp.csproj" />
