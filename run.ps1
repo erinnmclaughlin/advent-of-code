@@ -206,7 +206,7 @@ function Invoke-Python {
     Push-Location $pythonRoot
     try {
         Get-Content $InputFile -Raw |
-            python -m advent_of_code.cli $Year $Day
+            python cli.py $Year $Day
     }
     finally {
         Pop-Location
@@ -231,3 +231,5 @@ foreach ($language in $languagesToRun) {
         }
     }
 }
+
+Write-Host ""

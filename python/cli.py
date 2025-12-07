@@ -1,5 +1,5 @@
 import sys
-from advent_of_code.registry import get_solver
+from registry import get_solver
 
 
 def main() -> int:

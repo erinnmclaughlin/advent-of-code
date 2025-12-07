@@ -4,7 +4,7 @@ import importlib
 import pkgutil
 from typing import Callable, Dict, Tuple
 
-from . import y2025  # import year packages explicitly
+import y2025  # import year packages explicitly
 
 SolverFunc = Callable[[str], tuple[str, str]]
 
