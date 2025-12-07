@@ -5,10 +5,12 @@
         <Configuration>
 
           <!-- Restrict to main assemblies -->
+          <!--
           <Include>
             <ModulePath>.*AdventOfCode\.dll$</ModulePath>
             <ModulePath>.*AdventOfCode\.FSharp\.dll$</ModulePath>
-          </Include>
+          </Include
+          >-->
 
           <!-- Exclude glue files -->
           <ExcludeByFile>
@@ -19,7 +21,7 @@
             **/SolverRegistry.fs
             **/IAdventDay.fs
           </ExcludeByFile>
-          
+
         </Configuration>
       </DataCollector>
     </DataCollectors>
