@@ -2,7 +2,7 @@ namespace AdventOfCode.Y2025;
 
 public sealed class Day01() : AdventDay2025(1)
 {
-    public override (string Part1, string Part2) Solve(string input)
+    public override AdventDaySolution Solve(string input)
     { 
         var (current, part1, part2) = (50, 0, 0);
 
@@ -20,6 +20,6 @@ public sealed class Day01() : AdventDay2025(1)
             if (current == 0) part1++;
         }
 
-        return (part1.ToString(), part2.ToString());
+        return (part1, part2);
     }
 }

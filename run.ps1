@@ -123,7 +123,6 @@ switch ($Lang.ToLower()) {
         Get-Content $inputFile -Raw |
             dotnet run `
                 --project $csharpProject `
-                --no-build `
                 -- $Year $Day
             }
 
