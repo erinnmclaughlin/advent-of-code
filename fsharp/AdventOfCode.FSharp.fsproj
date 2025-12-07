@@ -13,6 +13,8 @@
 
     <Compile Include="Y2025\Day01.fs" />
 
+    <Compile Include="Y2025\Day02.fs" />
+
     <Compile Include="Program.fs" />
   </ItemGroup>
 

@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Include="Y2025\Day01Tests.fs" />
+    <Compile Include="Y2025\Day02Tests.fs" />
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
