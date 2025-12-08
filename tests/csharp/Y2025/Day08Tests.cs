@@ -2,7 +2,7 @@ using Day08 = AdventOfCode.Y2025.Day08;
 
 namespace AdventOfCode.Tests.Y2025;
 
-public sealed class Day08Tests(ITestOutputHelper output)
+public sealed class Day08Tests
 {
     private readonly IAdventDay _solver = SolverRegistry.Get(2025, 8);
 
@@ -32,9 +32,8 @@ public sealed class Day08Tests(ITestOutputHelper output)
     [Fact]
     public void Sample_matches_part_one_problem_statement()
     {
-        var circuits = Day08.GetCircuits(Sample, 10);
-        var biggest = Day08.GetLargestCircuits(circuits, 3);
-        var product = Day08.GetProduct(biggest);
+        var circuits = Day08.ProcessCircuits(Sample, 10);
+        var product = Day08.GetProduct(circuits);
         Assert.Equal(40, product);
     }
 
@@ -71,8 +70,8 @@ public sealed class Day08Tests(ITestOutputHelper output)
     [InlineData(10, 11)]
     public void Test_connection_count(int steps, int expected)
     {
-        var circuits = Day08.GetCircuits(Sample, steps);
-        Assert.Equal(expected, circuits.Count);
+        var circuits = Day08.ProcessCircuits(Sample, steps);
+        Assert.Equal(expected, circuits.Length);
     }
 
     [Theory]
@@ -82,7 +81,7 @@ public sealed class Day08Tests(ITestOutputHelper output)
     [InlineData(1, 7)]
     public void Test_junction_count(int junctionCount, int expectedNumCircuits)
     {
-        var circuits = Day08.GetCircuits(Sample, 10);
+        var circuits = Day08.ProcessCircuits(Sample, 10);
         Assert.Equal(expectedNumCircuits, circuits.Count(c => c.Junctions.Count == junctionCount));
     }
 }

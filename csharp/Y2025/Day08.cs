@@ -4,117 +4,35 @@ namespace AdventOfCode.Y2025;
 
 public sealed class Day08() : AdventDay(2025, 8)
 {
-    // 10260 is too low
-    // 10773 "that's not the right answer"
-    
-    // Current output:
-    // [999] There is 1 circuit with 27 junctions.
-    // [999] There are 2 circuits with 19 junctions.
-    // [999] There is 1 circuit with 17 junctions.
-    // [999] There are 2 circuits with 16 junctions.
-    // [999] There is 1 circuit with 15 junctions.
-    // [999] There are 3 circuits with 13 junctions.
-    // [999] There are 3 circuits with 12 junctions.
-    // [999] There are 7 circuits with 11 junctions.
-    // [999] There are 2 circuits with 10 junctions.
-    // [999] There are 7 circuits with 9 junctions.
-    // [999] There are 6 circuits with 8 junctions.
-    // [999] There are 13 circuits with 7 junctions.
-    // [999] There are 14 circuits with 6 junctions.
-    // [999] There are 13 circuits with 5 junctions.
-    // [999] There are 20 circuits with 4 junctions.
-    // [999] There are 24 circuits with 3 junctions.
-    // [999] There are 40 circuits with 2 junctions.
-    // [999] There are 116 circuits with 1 junctions.
-    // [999] Total junction count: 1000
-    // [999] Total circuit count: 275
-    // [999] : 27 * 19 * 19 = 9747
-    // 
-    // [1000] There is 1 circuit with 27 junctions.
-    // [1000] There is 1 circuit with 20 junctions.
-    // [1000] There is 1 circuit with 19 junctions.
-    // [1000] There is 1 circuit with 17 junctions.
-    // [1000] There are 2 circuits with 16 junctions.
-    // [1000] There is 1 circuit with 15 junctions.
-    // [1000] There are 3 circuits with 13 junctions.
-    // [1000] There are 3 circuits with 12 junctions.
-    // [1000] There are 7 circuits with 11 junctions.
-    // [1000] There are 2 circuits with 10 junctions.
-    // [1000] There are 7 circuits with 9 junctions.
-    // [1000] There are 6 circuits with 8 junctions.
-    // [1000] There are 13 circuits with 7 junctions.
-    // [1000] There are 14 circuits with 6 junctions.
-    // [1000] There are 13 circuits with 5 junctions.
-    // [1000] There are 20 circuits with 4 junctions.
-    // [1000] There are 24 circuits with 3 junctions.
-    // [1000] There are 39 circuits with 2 junctions.
-    // [1000] There are 117 circuits with 1 junctions.
-    // [1000] Total junction count: 1000
-    // [1000] Total circuit count: 275
-    // [1000] : 27 * 20 * 19 = 10260 
-    //  
-    // [1001] There is 1 circuit with 27 junctions.
-    // [1001] There is 1 circuit with 20 junctions.
-    // [1001] There is 1 circuit with 19 junctions.
-    // [1001] There is 1 circuit with 17 junctions.
-    // [1001] There are 2 circuits with 16 junctions.
-    // [1001] There is 1 circuit with 15 junctions.
-    // [1001] There are 3 circuits with 13 junctions.
-    // [1001] There are 3 circuits with 12 junctions.
-    // [1001] There are 7 circuits with 11 junctions.
-    // [1001] There are 3 circuits with 10 junctions.
-    // [1001] There are 6 circuits with 9 junctions.
-    // [1001] There are 6 circuits with 8 junctions.
-    // [1001] There are 13 circuits with 7 junctions.
-    // [1001] There are 14 circuits with 6 junctions.
-    // [1001] There are 13 circuits with 5 junctions.
-    // [1001] There are 20 circuits with 4 junctions.
-    // [1001] There are 23 circuits with 3 junctions.
-    // [1001] There are 40 circuits with 2 junctions.
-    // [1001] There are 117 circuits with 1 junctions.
-    // [1001] Total junction count: 1000
-    // [1001] Total circuit count: 275
-    // [1001] : 27 * 20 * 19 = 10260
     public override AdventDaySolution Solve(string input)
     {
-        var part1 = 0L;
+        var circuits = ProcessCircuits(input, 1000);
+        var part1 = GetProduct(circuits);
         
-        for (var i = 999; i <= 1001; i++)
-        {
-            var circuits = GetCircuits(input, i);
-            
-            foreach (var group in circuits.GroupBy(x => x.Junctions.Count).OrderByDescending(x => x.Key))
-            {
-                var count = group.Count();
-                var isAre = count == 1 ? "is" : "are";
-                var pluralS = count == 1 ? "" : "s";
-                Console.WriteLine($"[{i}] There {isAre} {count} circuit{pluralS} with {group.Key} junctions.");
-            }
-            
-            Console.WriteLine($"[{i}] Total junction count: {circuits.Sum(x => x.Junctions.Count)}");
-            Console.WriteLine($"[{i}] Total circuit count: {circuits.Count}");
-            
-            var biggest = GetLargestCircuits(circuits, 3);
-            var product = GetProduct(biggest);
-
-            Console.WriteLine($"[{i}] : {string.Join(" * ", biggest)} = {product}");
-            Console.WriteLine();
-
-            if (i == 1000)
-                part1 = product;
-        }
-
         return (part1, "");
     }
 
-    public static long GetProduct(List<long> biggest)
+    public static Circuit[] ProcessCircuits(string input, int steps)
     {
-        return biggest.Skip(1).Aggregate(biggest[0], (current, b) => current * b);
+        var pairsProcessed = 0;
+        var positions = ParseInput(input).ToArray();
+
+        foreach (var (_, p1, p2) in EnumeratePairs(positions).OrderBy(x => x.Distance).ToList())
+        {
+            p1.MergeWith(p2);
+            pairsProcessed++;
+            
+            if (pairsProcessed == steps)
+                break;
+        }
+        
+        return positions.Select(x => x.Circuit).Distinct().ToArray();
     }
 
-    public static List<long> GetLargestCircuits(List<Circuit> circuits, int take)
+    public static long GetProduct(Circuit[] circuits, int take = 3)
     {
-        return circuits.Select(x => (long)x.Junctions.Count).OrderDescending().Take(take).ToList();
+        var biggest = circuits.Select(x => x.Junctions.Count).OrderDescending().Take(take).ToList();
+        return biggest.Skip(1).Aggregate(biggest[0], (current, b) => current * b);
     }
 
     public static IEnumerable<(float Distance, JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(string input)
@@ -123,7 +41,7 @@ public sealed class Day08() : AdventDay(2025, 8)
         return EnumeratePairs(positions);
     }
     
-    public static IEnumerable<(float Distance, JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(JunctionBox[] positions)
+    private static IEnumerable<(float Distance, JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(JunctionBox[] positions)
     {
         var pairs = new HashSet<(JunctionBox, JunctionBox)>();
         
@@ -142,26 +60,6 @@ public sealed class Day08() : AdventDay(2025, 8)
         }
     }
 
-    public static List<Circuit> GetCircuits(string input, int steps)
-    {
-        var connectionsMade = 0;
-        var positions = ParseInput(input).ToArray();
-
-        foreach (var (_, p1, p2) in EnumeratePairs(positions).OrderBy(x => x.Distance))
-        {
-            if (p1.Circuit != p2.Circuit)
-            {
-                p1.MergeWith(p2);
-                connectionsMade++;
-            }
-            
-            if (connectionsMade == steps)
-                break;
-        }
-        
-        return positions.Select(x => x.Circuit).Distinct().ToList();
-    }
-
     private static IEnumerable<JunctionBox> ParseInput(string input)
     {
         return InputHelper.GetLines(input).Select(ParseLine);
@@ -178,6 +76,7 @@ public sealed class Day08() : AdventDay(2025, 8)
         public Vector3 Position { get; }
 
         public Circuit Circuit { get; set; }
+        public HashSet<JunctionBox> DirectConnections { get; } = [];
         
         public JunctionBox(int x, int y, int z)
         {
@@ -192,20 +91,25 @@ public sealed class Day08() : AdventDay(2025, 8)
             return Vector3.Distance(Position, other.Position);
         }
 
-        public void MergeWith(JunctionBox other)
+        public bool MergeWith(JunctionBox other)
         {
-            if (Circuit.Junctions.Count < other.Circuit.Junctions.Count)
+            var c1 = DirectConnections.Add(other);
+            var c2 = other.DirectConnections.Add(this);
+            
+            if (!c1 || !c2)
+                return false;
+
+            if (Circuit != other.Circuit)
             {
-                Circuit.Junctions.Remove(this);
-                Circuit = other.Circuit;
-                other.Circuit.Junctions.Add(this);
+                var newCircuit = new Circuit();
+                var allJunctions = Circuit.Junctions.Union(other.Circuit.Junctions).ToList();
+                foreach (var junction in allJunctions)
+                {
+                    newCircuit.AddJunction(junction);
+                }
             }
-            else
-            {
-                other.Circuit.Junctions.Remove(other);
-                other.Circuit = Circuit;
-                Circuit.Junctions.Add(other);
-            }
+
+            return true;
         }
     }
 
@@ -219,6 +123,13 @@ public sealed class Day08() : AdventDay(2025, 8)
 
         public Circuit(JunctionBox box)
         {
+            AddJunction(box);
+        }
+        
+        public void AddJunction(JunctionBox box)
+        {
+            box.Circuit?.Junctions.Remove(box);
+            box.Circuit = this;
             Junctions.Add(box);
         }
     }
