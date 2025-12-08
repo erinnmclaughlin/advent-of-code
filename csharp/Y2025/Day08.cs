@@ -4,6 +4,8 @@ namespace AdventOfCode.Y2025;
 
 public sealed class Day08() : AdventDay(2025, 8)
 {
+    // TODO: Solve parts 1 and 2 together in same loop
+    
     public override AdventDaySolution Solve(string input)
     {
         var circuits = ProcessCircuits(input, 1000);
