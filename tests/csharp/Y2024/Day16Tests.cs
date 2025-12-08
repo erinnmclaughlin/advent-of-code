@@ -1,6 +1,6 @@
 namespace AdventOfCode.Tests.Y2024;
 
-public class Day16Tests
+public sealed class Day16Tests
 {
     private readonly IAdventDay _solver = SolverRegistry.Get(2024, 16);
 

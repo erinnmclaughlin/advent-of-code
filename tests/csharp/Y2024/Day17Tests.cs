@@ -2,7 +2,7 @@ using AdventOfCode.Y2024;
 
 namespace AdventOfCode.Tests.Y2024;
 
-public class Day17Tests
+public sealed class Day17Tests
 {
     private readonly IAdventDay _solver = SolverRegistry.Get(2024, 17);
 
