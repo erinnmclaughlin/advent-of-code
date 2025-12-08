@@ -7,7 +7,10 @@ param(
     [int] $Day,
 
     # Which languages to scaffold; default is all
-    [string[]] $Langs = @("csharp", "fsharp", "python")
+    [string[]] $Langs = @("csharp", "fsharp", "python"),
+
+    # Force a fresh download of the input
+    [switch] $DownloadInput
 )
 
 $ErrorActionPreference = "Stop"
@@ -17,6 +20,57 @@ $repoRoot = Resolve-Path $PSScriptRoot
 
 Write-Host "Scaffolding Year $Year Day $dayPadded..."
 Write-Host ""
+
+
+# ----------------------------
+# AoC input download helper
+# ----------------------------
+function Get-AocInput {
+    param(
+        [int] $Year,
+        [int] $Day,
+        [string] $DestinationPath
+    )
+
+    $session = $env:AOC_SESSION
+    if (-not $session) {
+        throw @"
+Advent of Code session cookie not found.
+
+Set it once with:
+  pwsh ./run.ps1 -SetSessionCookie "<your-cookie>" ...
+
+Or manually set AOC_SESSION in your environment.
+"@
+    }
+
+    $uri = "https://adventofcode.com/$Year/day/$Day/input"
+    Write-Host "Downloading input from $uri..."
+
+    if (-not (Test-Path (Split-Path $DestinationPath -Parent))) {
+        New-Item -ItemType Directory -Force `
+            -Path (Split-Path $DestinationPath -Parent) | Out-Null
+    }
+
+    $headers = @{
+        Cookie = "session=$session"
+    }
+
+    try {
+        Invoke-WebRequest `
+            -Uri $uri `
+            -Headers $headers `
+            -UseBasicParsing |
+            Select-Object -ExpandProperty Content |
+            ForEach-Object { $_.TrimEnd("`r", "`n") } |
+            Out-File -Encoding utf8 -FilePath $DestinationPath
+
+        Write-Host "Saved input to $DestinationPath"
+    }
+    catch {
+        throw "Failed to download input: $($_.Exception.Message)"
+    }
+}
 
 # ----------------------------
 # Helper: create file if missing
@@ -45,7 +99,9 @@ function New-FileIfMissing {
 $inputDir = Join-Path $repoRoot "inputs/$Year"
 $inputFile = Join-Path $inputDir "day$dayPadded.txt"
 
-New-FileIfMissing -Path $inputFile -Content ""
+if ($DownloadInput -or -not (Test-Path $inputFile)) {
+    Get-AocInput -Year $Year -Day $Day -DestinationPath $inputFile
+}
 
 # ----------------------------
 # 2. C# solution + tests
@@ -67,10 +123,7 @@ public sealed class Day$dayPadded : IAdventDay
 
     public AdventDaySolution Solve(string input)
     {
-        var lines = input.Split(
-            ['\r', '\n'],
-            StringSplitOptions.RemoveEmptyEntries
-        );
+        var lines = ParseInput(input);
 
         // TODO: implement puzzle logic here
 
@@ -79,6 +132,8 @@ public sealed class Day$dayPadded : IAdventDay
 
         return (part1, part2);
     }
+    
+    private static string[] ParseInput(string input) => InputHelper.GetLines(input);
 }
 "@
 
@@ -95,13 +150,16 @@ public class Day${dayPadded}Tests
 {
     private readonly IAdventDay _solver = SolverRegistry.Get($Year, $Day);
 
-    private const string Sample = "REPLACE THIS WITH SAMPLE INPUT";
+    private const string Sample = """
+    REPLACE THIS WITH SAMPLE INPUT
+    """;
 
     [Fact]
     public void Sample_matches_part_one_problem_statement()
     {
         var (p1, _) = _solver.Solve(Sample);
         Assert.Skip("Not implemented");
+        Assert.Equal("", p1);
     }
 
     [Fact]
@@ -109,6 +167,7 @@ public class Day${dayPadded}Tests
     {
         var (_, p2) = _solver.Solve(Sample);
         Assert.Skip("Not implemented");
+        Assert.Equal("", p2);
     }
 }
 "@
