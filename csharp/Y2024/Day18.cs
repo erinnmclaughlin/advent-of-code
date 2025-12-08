@@ -12,7 +12,9 @@ public sealed class Day18() : AdventDay(2024, 18)
         var startPosition = new Vector2D(0, 0);
         var targetPosition = new Vector2D(size - 1, size - 1);
 
-        foreach (var (x,y) in InputHelper.GetLines(input).Select(ParseLine).Take(steps))
+        var bytes = InputHelper.GetLines(input).Select(ParseLine).ToArray();
+
+        foreach (var (x,y) in bytes.Take(steps))
         {
             maze.Walls.Add(new Vector2D(x, y));
         }
@@ -24,6 +26,16 @@ public sealed class Day18() : AdventDay(2024, 18)
         };
 
         var cost = runners.Min(x => x.EnumerateSolutions().Min(x => x.Cost));
+
+        foreach (var (x,y) in bytes.Skip(steps))
+        {
+            maze.Walls.Add(new Vector2D(x, y));
+
+            runners.ForEach(r => r.Reset());
+
+            if (runners.All(r => !r.EnumerateSolutions().Any()))
+                return (cost, $"{x},{y}");
+        }
 
         return (cost, "");
     }

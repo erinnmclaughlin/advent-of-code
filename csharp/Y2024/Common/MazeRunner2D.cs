@@ -20,6 +20,13 @@ public sealed class MazeRunner2D
         _queue.Enqueue(new MazeRunnerState2D(startDirection, startPosition), 0);
     }
 
+    public void Reset()
+    {
+        _queue.Clear();
+        _visited.Clear();
+        _queue.Enqueue(new MazeRunnerState2D(StartDirection, StartPosition), 0);
+    }
+
     public IEnumerable<MazeRunnerState2D> EnumerateSolutions(IMazeRunner2DCostCalculator? costCalculator = null)
     {
         MazeRunnerState2D? knownSolution = null;

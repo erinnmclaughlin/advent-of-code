@@ -44,9 +44,8 @@ public class Day18Tests(ITestOutputHelper output)
     [Fact]
     public void Sample_matches_part_two_problem_statement()
     {
-        var (_, p2) = _solver.Solve(Sample);
-        Assert.Skip("Not implemented");
-        Assert.Equal("", p2);
+        var (_, p2) = Day18.Solve(Sample, 7, 12);
+        Assert.Equal("6,1", p2);
     }
 
     [Fact]
