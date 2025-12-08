@@ -41,8 +41,7 @@ public sealed class Day08Tests
     public void Sample_matches_part_two_problem_statement()
     {
         var (_, p2) = _solver.Solve(Sample);
-        Assert.Skip("Not implemented");
-        Assert.Equal("", p2);
+        Assert.Equal("25272", p2);
     }
     
     [Fact]

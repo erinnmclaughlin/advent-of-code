@@ -8,8 +8,28 @@ public sealed class Day08() : AdventDay(2025, 8)
     {
         var circuits = ProcessCircuits(input, 1000);
         var part1 = GetProduct(circuits);
+        var part2 = MergeIntoOneCircuit(input);
         
-        return (part1, "");
+        return (part1, part2);
+    }
+    
+    public static long MergeIntoOneCircuit(string input)
+    {
+        var positions = ParseInput(input).ToArray();
+        var circuits = positions.Select(x => x.Circuit).ToHashSet();
+
+        foreach (var (_, p1, p2) in EnumeratePairs(positions).OrderBy(x => x.Distance))
+        {
+            p1.ConnectTo(p2);
+            circuits.RemoveWhere(c => c.Junctions.Count == 0);
+            
+            if (circuits.Count == 1)
+            {
+                return (long)p1.Position.X * (long)p2.Position.X;
+            }
+        }
+
+        return -1;
     }
 
     public static Circuit[] ProcessCircuits(string input, int steps)
@@ -17,9 +37,9 @@ public sealed class Day08() : AdventDay(2025, 8)
         var pairsProcessed = 0;
         var positions = ParseInput(input).ToArray();
 
-        foreach (var (_, p1, p2) in EnumeratePairs(positions).OrderBy(x => x.Distance).ToList())
+        foreach (var (_, p1, p2) in EnumeratePairs(positions).OrderBy(x => x.Distance))
         {
-            p1.MergeWith(p2);
+            p1.ConnectTo(p2);
             pairsProcessed++;
             
             if (pairsProcessed == steps)
@@ -73,64 +93,45 @@ public sealed class Day08() : AdventDay(2025, 8)
 
     public sealed class JunctionBox
     {
-        public Vector3 Position { get; }
-
         public Circuit Circuit { get; set; }
-        public HashSet<JunctionBox> DirectConnections { get; } = [];
+        public Vector3 Position { get; }
         
         public JunctionBox(int x, int y, int z)
         {
             Position = new Vector3(x, y, z);
-            Circuit = new Circuit(this);
+            Circuit = new Circuit();
+            Circuit.AddJunction(this);
         }
-        
-        public override string ToString() => Position.ToString();
+
+        public override string ToString()
+        {
+            return Position.ToString();
+        }
 
         public float GetDistanceTo(JunctionBox other)
         {
             return Vector3.Distance(Position, other.Position);
         }
 
-        public bool MergeWith(JunctionBox other)
+        public void ConnectTo(JunctionBox other)
         {
-            var c1 = DirectConnections.Add(other);
-            var c2 = other.DirectConnections.Add(this);
-            
-            if (!c1 || !c2)
-                return false;
-
-            if (Circuit != other.Circuit)
+            foreach (var junction in other.Circuit.Junctions.ToList())
             {
-                var newCircuit = new Circuit();
-                var allJunctions = Circuit.Junctions.Union(other.Circuit.Junctions).ToList();
-                foreach (var junction in allJunctions)
-                {
-                    newCircuit.AddJunction(junction);
-                }
+                Circuit.AddJunction(junction);
             }
-
-            return true;
         }
     }
 
     public sealed class Circuit
     {
-        public List<JunctionBox> Junctions { get; } = [];
+        private readonly HashSet<JunctionBox> _junctions = [];
+        public IReadOnlySet<JunctionBox> Junctions => _junctions;
 
-        public Circuit()
-        {
-        }
-
-        public Circuit(JunctionBox box)
-        {
-            AddJunction(box);
-        }
-        
         public void AddJunction(JunctionBox box)
         {
-            box.Circuit?.Junctions.Remove(box);
+            box.Circuit._junctions.Remove(box);
             box.Circuit = this;
-            Junctions.Add(box);
+            _junctions.Add(box);
         }
     }
 }
