@@ -116,24 +116,16 @@ if ($Langs -contains "csharp") {
     $csContent = @"
 namespace AdventOfCode.Y$Year;
 
-public sealed class Day$dayPadded : IAdventDay
+public sealed class Day$dayPadded() : AdventDay($Year, $Day)
 {
-    public int Year => $Year;
-    public int Day => $Day;
-
-    public AdventDaySolution Solve(string input)
+    public override AdventDaySolution Solve(string input)
     {
-        var lines = ParseInput(input);
+        var lines = InputHelper.GetLines(input);
 
         // TODO: implement puzzle logic here
 
-        var part1 = "";
-        var part2 = "";
-
-        return (part1, part2);
+        return ("", "");
     }
-    
-    private static string[] ParseInput(string input) => InputHelper.GetLines(input);
 }
 "@
 
