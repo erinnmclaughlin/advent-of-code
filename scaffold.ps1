@@ -155,23 +155,48 @@ type Day$dayPadded() =
 
     New-FileIfMissing -Path $fsFile -Content $fsContent
 
-    # Add Compile include to fsharp/AdventOfCode.FSharp.fsproj
+    # Add + sort Compile includes for puzzle sources in fsharp/AdventOfCode.FSharp.fsproj
     $fsprojPath = Join-Path $repoRoot "fsharp/AdventOfCode.FSharp.fsproj"
     $fsprojContent = Get-Content $fsprojPath -Raw
-    
-    $compileEntry = "    <Compile Include=""Y$Year\Day$dayPadded.fs"" />"
-    
-    # Check if entry already exists
-    if ($fsprojContent -notmatch [regex]::Escape($compileEntry)) {
-        # Find the location to insert: before <Compile Include="Program.fs" />
-        $programfsLine = '    <Compile Include="Program.fs" />'
-        
-        if ($fsprojContent -match [regex]::Escape($programfsLine)) {
-            $fsprojContent = $fsprojContent -replace [regex]::Escape($programfsLine), "$compileEntry`r`n`r`n$programfsLine"
-            $fsprojContent | Out-File -FilePath $fsprojPath -Encoding UTF8 -NoNewline
-            Write-Host "  - Added entry to .fsproj: Y$Year\Day$dayPadded.fs"
+
+
+    # Collect existing <Compile Include="Y...Day...fs" /> lines (accept either slash)
+    $compileTagMatches = [regex]::Matches($fsprojContent, '    <Compile Include="Y\d{4}[\\/]Day\d{2}\.fs" />')
+    $compileLines = @()
+    foreach ($m in $compileTagMatches) {
+        $compileLines += $m.Value
+    }
+    # Add the new entry as a string (always)
+    $newTag = '    <Compile Include="Y' + $Year + '\Day' + $dayPadded + '.fs" />'
+    $compileLines += $newTag
+    # Deduplicate and sort alphabetically
+    $sortedCompileLines = ($compileLines | Sort-Object | Select-Object -Unique) -join "`r`n"
+
+    # Remove any existing Y... Day... lines so we can re-insert sorted block
+    $fsprojContentClean = [regex]::Replace($fsprojContent, '(?m)^\s*<Compile Include="Y\d{4}[\\/]Day\d{2}\.fs" />\s*\r?\n', '')
+
+    # Insert before Program.fs if present, else fallback to insert before the first </ItemGroup>
+    $programfsLine = '    <Compile Include="Program.fs" />'
+    if ($fsprojContentClean -match [regex]::Escape($programfsLine)) {
+        $fsprojContentNew = $fsprojContentClean -replace [regex]::Escape($programfsLine), "$sortedCompileLines`r`n`r`n$programfsLine"
+        $fsprojContentNew | Out-File -FilePath $fsprojPath -Encoding UTF8 -NoNewline
+        Write-Host "  - Updated .fsproj with sorted puzzle entries"
+    } else {
+        # Fallback: insert into the first ItemGroup that contains other Compile entries
+        if ($fsprojContentClean -match '(?s)<ItemGroup>.*?</ItemGroup>') {
+            $closingTag = '</ItemGroup>'
+            $idx = $fsprojContentClean.IndexOf($closingTag)
+            if ($idx -ge 0) {
+                $before = $fsprojContentClean.Substring(0, $idx)
+                $after = $fsprojContentClean.Substring($idx)
+                $fsprojContentNew = $before + "`r`n" + $sortedCompileLines + "`r`n`r`n" + $after
+                $fsprojContentNew | Out-File -FilePath $fsprojPath -Encoding UTF8 -NoNewline
+                Write-Host "  - Updated .fsproj (fallback insertion) with sorted puzzle entries"
+            } else {
+                Write-Host "  - Warning: Could not find closing </ItemGroup> to insert entries"
+            }
         } else {
-            Write-Host "  - Warning: Could not find Program.fs line in .fsproj to add entry"
+            Write-Host "  - Warning: Could not find insertion point to update .fsproj"
         }
     }
 
@@ -203,23 +228,47 @@ type Day${dayPadded}Tests() =
 
     New-FileIfMissing -Path $fsTestFile -Content $fsTestContent
 
-    # Add Compile include to tests/fsharp/AdventOfCode.FSharp.Tests.fsproj
+    # Add + sort Compile includes for test files in tests/fsharp/AdventOfCode.FSharp.Tests.fsproj
     $fsTestProjPath = Join-Path $repoRoot "tests/fsharp/AdventOfCode.FSharp.Tests.fsproj"
     $fsTestProjContent = Get-Content $fsTestProjPath -Raw
-    
-    $testCompileEntry = "    <Compile Include=""Y$Year\Day${dayPadded}Tests.fs"" />"
-    
-    # Check if entry already exists
-    if ($fsTestProjContent -notmatch [regex]::Escape($testCompileEntry)) {
-        # Find the location to insert: before <Content Include="xunit.runner.json"
-        $xunitLine = '    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />'
-        
-        if ($fsTestProjContent -match [regex]::Escape($xunitLine)) {
-            $fsTestProjContent = $fsTestProjContent -replace [regex]::Escape($xunitLine), "$testCompileEntry`r`n$xunitLine"
-            $fsTestProjContent | Out-File -FilePath $fsTestProjPath -Encoding UTF8 -NoNewline
-            Write-Host "  - Added entry to test .fsproj: Y$Year\Day${dayPadded}Tests.fs"
+
+
+    # Collect existing <Compile Include="Y...Day...Tests.fs" /> lines (accept either slash)
+    $testTagMatches = [regex]::Matches($fsTestProjContent, '    <Compile Include="Y\d{4}[\\/]Day\d{2}Tests\.fs" />')
+    $testLines = @()
+    foreach ($m in $testTagMatches) {
+        $testLines += $m.Value
+    }
+    # Add the new entry as a string (always)
+    $newTestTag = '    <Compile Include="Y' + $Year + '\Day' + $dayPadded + 'Tests.fs" />'
+    $testLines += $newTestTag
+    # Deduplicate and sort alphabetically
+    $sortedTestLines = ($testLines | Sort-Object | Select-Object -Unique) -join "`r`n"
+
+    # Remove existing test Day lines then insert sorted block before xunit runner content if possible
+    $fsTestProjContentClean = [regex]::Replace($fsTestProjContent, '(?m)^\s*<Compile Include="Y\d{4}[\\/]Day\d{2}Tests\.fs" />\s*\r?\n', '')
+
+    $xunitLine = '    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />'
+    if ($fsTestProjContentClean -match [regex]::Escape($xunitLine)) {
+        $fsTestProjContentNew = $fsTestProjContentClean -replace [regex]::Escape($xunitLine), "$sortedTestLines`r`n$xunitLine"
+        $fsTestProjContentNew | Out-File -FilePath $fsTestProjPath -Encoding UTF8 -NoNewline
+        Write-Host "  - Updated test .fsproj with sorted test entries"
+    } else {
+        # Fallback to inserting into first ItemGroup
+        if ($fsTestProjContentClean -match '(?s)<ItemGroup>.*?</ItemGroup>') {
+            $closingTag = '</ItemGroup>'
+            $idx = $fsTestProjContentClean.IndexOf($closingTag)
+            if ($idx -ge 0) {
+                $before = $fsTestProjContentClean.Substring(0, $idx)
+                $after = $fsTestProjContentClean.Substring($idx)
+                $fsTestProjContentNew = $before + "`r`n" + $sortedTestLines + "`r`n" + $after
+                $fsTestProjContentNew | Out-File -FilePath $fsTestProjPath -Encoding UTF8 -NoNewline
+                Write-Host "  - Updated test .fsproj (fallback insertion) with sorted test entries"
+            } else {
+                Write-Host "  - Warning: Could not find closing </ItemGroup> to insert test entries"
+            }
         } else {
-            Write-Host "  - Warning: Could not find xunit.runner.json line in test .fsproj to add entry"
+            Write-Host "  - Warning: Could not find insertion point to update test .fsproj"
         }
     }
 }
