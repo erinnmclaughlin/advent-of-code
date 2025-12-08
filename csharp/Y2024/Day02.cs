@@ -9,8 +9,6 @@ public sealed class Day02 : IAdventDay
     {
         var lines = ParseInput(input);
 
-        // TODO: implement puzzle logic here
-
         var part1 = lines.Count(IsSafe);
         var part2 = lines.Count(levels => IsSafe(levels) || levels.Any((_, i) => IsSafeWithoutElement(levels, i)));
 
