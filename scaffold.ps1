@@ -202,6 +202,26 @@ type Day${dayPadded}Tests() =
 "@
 
     New-FileIfMissing -Path $fsTestFile -Content $fsTestContent
+
+    # Add Compile include to tests/fsharp/AdventOfCode.FSharp.Tests.fsproj
+    $fsTestProjPath = Join-Path $repoRoot "tests/fsharp/AdventOfCode.FSharp.Tests.fsproj"
+    $fsTestProjContent = Get-Content $fsTestProjPath -Raw
+    
+    $testCompileEntry = "    <Compile Include=""Y$Year\Day${dayPadded}Tests.fs"" />"
+    
+    # Check if entry already exists
+    if ($fsTestProjContent -notmatch [regex]::Escape($testCompileEntry)) {
+        # Find the location to insert: before <Content Include="xunit.runner.json"
+        $xunitLine = '    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />'
+        
+        if ($fsTestProjContent -match [regex]::Escape($xunitLine)) {
+            $fsTestProjContent = $fsTestProjContent -replace [regex]::Escape($xunitLine), "$testCompileEntry`r`n$xunitLine"
+            $fsTestProjContent | Out-File -FilePath $fsTestProjPath -Encoding UTF8 -NoNewline
+            Write-Host "  - Added entry to test .fsproj: Y$Year\Day${dayPadded}Tests.fs"
+        } else {
+            Write-Host "  - Warning: Could not find xunit.runner.json line in test .fsproj to add entry"
+        }
+    }
 }
 
 # ----------------------------
