@@ -4,7 +4,7 @@ public sealed class Day16() : AdventDay(2024, 16)
 {
     public override AdventDaySolution Solve(string input)
     {
-        var solutions =  CreateRunner(InputHelper.GetLines(input)).EnumerateSolutions().ToArray();
+        var solutions =  CreateRunner(InputHelper.GetLines(input)).EnumerateSolutions(new MazeRunnerCostCalculator()).ToArray();
 
         var part1 = solutions.First().Cost;
         var part2 = solutions.SelectMany(x => x.EnumerateVisitedPositions()).Distinct().Count();
@@ -43,4 +43,13 @@ public sealed class Day16() : AdventDay(2024, 16)
 
         return new MazeRunner2D(maze, Direction.Right, start, target);
     }
+
+    public sealed class MazeRunnerCostCalculator : IMazeRunner2DCostCalculator
+    {
+        public int CalculateCost(MazeRunnerState2D currentState, Direction directionToMove)
+        {
+            return (currentState.Direction == directionToMove ? 1 : 1001);
+        }
+    }
+
 }

@@ -20,7 +20,7 @@ public sealed class MazeRunner2D
         _queue.Enqueue(new MazeRunnerState2D(startDirection, startPosition), 0);
     }
 
-    public IEnumerable<MazeRunnerState2D> EnumerateSolutions()
+    public IEnumerable<MazeRunnerState2D> EnumerateSolutions(IMazeRunner2DCostCalculator? costCalculator = null)
     {
         MazeRunnerState2D? knownSolution = null;
         
@@ -54,7 +54,7 @@ public sealed class MazeRunner2D
                     if (dir == currentState.Direction.GetOpposite()) 
                         continue;
 
-                    var nextState = currentState.GetNextState(dir);
+                    var nextState = currentState.GetNextState(dir, costCalculator);
                     _queue.Enqueue(nextState, nextState.Cost);
                 }
             }

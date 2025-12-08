@@ -33,9 +33,9 @@ public sealed class MazeRunnerState2D(Direction direction, Vector2D position)
         }
     }
     
-    public MazeRunnerState2D GetNextState(Direction directionToMove) => new(directionToMove, Position + directionToMove)
+    public MazeRunnerState2D GetNextState(Direction directionToMove, IMazeRunner2DCostCalculator? costCalculator = null) => new(directionToMove, Position + directionToMove)
     {
-        Cost = Cost + (Direction == directionToMove ? 1 : 1001),
+        Cost = Cost + (costCalculator ?? new DefaultMazeRunner2DCostCalculator()).CalculateCost(this, directionToMove),
         PreviousState = this
     };
 }
