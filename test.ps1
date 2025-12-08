@@ -24,6 +24,7 @@ if ($Langs -contains "csharp") {
         Write-Host ">>> Running C# tests"
         dotnet test $csharpTests `
             --collect:"XPlat Code Coverage" `
+            --logger:"junit;LogFilePath=TestResults/junit.xml" `
             --settings "./.runsettings"
     } else {
         Write-Warning "C# tests not found, skipping"

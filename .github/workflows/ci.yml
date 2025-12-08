@@ -46,3 +46,12 @@ jobs:
             tests/**/coverage.cobertura.xml
             python/coverage.xml
           fail_ci_if_error: true
+      
+      # --- Upload coverage to Codecov ---
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: |
+            tests/**/TestResults/junit.xml
