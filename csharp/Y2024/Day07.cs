@@ -4,7 +4,7 @@ public sealed class Day07() : AdventDay(2024, 7)
 {
     public override AdventDaySolution Solve(string input)
     {
-        var lines = ParseInput(input);
+        var lines = ParseInput(input).ToArray();
 
         var part1 = lines.Sum(line =>
         {

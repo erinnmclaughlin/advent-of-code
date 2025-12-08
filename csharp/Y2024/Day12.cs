@@ -49,7 +49,7 @@ public sealed class Day12() : AdventDay(2024, 12)
     
     private sealed class CellGroup(char label)
     {
-        public char Label { get; } = label;
+        private char Label { get; } = label;
         public List<Cell> Cells { get; } = [];
 
         public bool CanMergeWith(CellGroup other)

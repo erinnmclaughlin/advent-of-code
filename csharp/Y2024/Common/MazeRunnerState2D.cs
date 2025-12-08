@@ -1,6 +1,6 @@
 namespace AdventOfCode.Y2024;
 
-public class MazeRunnerState2D(Direction direction, Vector2D position)
+public sealed class MazeRunnerState2D(Direction direction, Vector2D position)
 {
     public int Cost { get; private init; }
     public Direction Direction { get; } = direction;

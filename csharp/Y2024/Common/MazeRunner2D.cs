@@ -1,6 +1,6 @@
 namespace AdventOfCode.Y2024;
 
-public class MazeRunner2D
+public sealed class MazeRunner2D
 {
     private readonly PriorityQueue<MazeRunnerState2D, int> _queue = new();
     private readonly HashSet<(Direction Direction, Vector2D Position)> _visited = [];

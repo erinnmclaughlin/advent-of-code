@@ -1,6 +1,6 @@
 namespace AdventOfCode.Y2024;
 
-public class Maze2D(int height, int width)
+public sealed class Maze2D(int height, int width)
 {
     public int Height { get; } = height;
     public int Width { get; } = width;

@@ -4,7 +4,7 @@ public sealed class Day02() : AdventDay(2024, 2)
 {
     public override AdventDaySolution Solve(string input)
     {
-        var lines = ParseInput(input);
+        var lines = ParseInput(input).ToArray();
 
         var part1 = lines.Count(IsSafe);
         var part2 = lines.Count(levels => IsSafe(levels) || levels.Any((_, i) => IsSafeWithoutElement(levels, i)));

@@ -66,7 +66,7 @@ public sealed class Day06() : AdventDay(2024, 6)
     private static bool TryGetPath(ref Span<string> map, int x, int y, out HashSet<(Facing dir, int x, int y)> path)
     {
         var (facing, nextX, nextY) = (Facing.Up, x, y);
-        path = new HashSet<(Facing, int, int)> { (facing,nextX,nextY) };
+        path = [(facing, nextX, nextY)];
 
         while (true)
         {

@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace AdventOfCode.Y2024;
 
 public sealed class Day11() : AdventDay(2024, 11)
@@ -52,41 +50,5 @@ public sealed class Day11() : AdventDay(2024, 11)
     {
         public string Number { get; set; } = number;
         public long Count { get; set; } = 1;
-    }
-    
-    // original solution; worked for part one but way too slow for part two
-    public static long CountStonesSlow(ReadOnlySpan<char> span, int numberOfRounds)
-    {
-        for (var i = 0; i < numberOfRounds; i++)
-        {
-            var newSpan = new StringBuilder();
-            var split = span.Split(' ');
-            while (split.MoveNext())
-            {
-                var (offset, length) = split.Current.GetOffsetAndLength(span.Length);
-                var number = span.Slice(offset, length);
-
-                if (number is "0")
-                {
-                    newSpan.Append("1 ");
-                }
-                else if (number.Length % 2 == 0)
-                {
-                    var n1 = number[..(number.Length / 2)];
-                    newSpan.Append(n1).Append(' ');
-                    var n2 = number[(number.Length / 2)..].TrimStart('0');
-                    newSpan.Append(n2.IsEmpty ? "0" : n2).Append(' ');
-                }
-                else
-                {
-                    newSpan.Append(long.Parse(number) * 2024).Append(' ');
-                }
-            }
-
-            span = newSpan.ToString().AsSpan().TrimEnd(' ');
-        }
-
-        return span.ToString().Split(' ').Distinct().Count();
-        //return span.Count(' ') + 1;
     }
 }

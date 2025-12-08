@@ -91,7 +91,7 @@ file static class Extensions
         return checkSum;
     }
 
-    public static Span<short> GetFreeDiskSpace(this Span<short> disk, int size)
+    private static Span<short> GetFreeDiskSpace(this Span<short> disk, int size)
     {
         var start = disk.IndexOf(Enumerable.Repeat(FreeSpaceId, size).ToArray());
         return start == -1 ? Span<short>.Empty : disk.Slice(start, size);

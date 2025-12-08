@@ -144,9 +144,9 @@ public sealed class Day15() : AdventDay(2024, 15)
         public bool CollidesWith(MapObject other) => other != this && EnumerateCoordinates.Any(other.EnumerateCoordinates.Contains);
     }
 
-    public class Box : MapObject;
-    public class Robot : MapObject;
-    public class Wall : MapObject
+    public sealed class Box : MapObject;
+    public sealed class Robot : MapObject;
+    public sealed class Wall : MapObject
     {
         public override bool Movable { get; set; } = false;
     }

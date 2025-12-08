@@ -41,7 +41,7 @@ file static class Extensions
             yield return nextEnd;
     }
 
-    public static IEnumerable<Coord> EnumerateNextSteps(string[] map, Coord pos)
+    private static IEnumerable<Coord> EnumerateNextSteps(string[] map, Coord pos)
     {
         var nextValue = map[pos.Row][pos.Col] + 1;
         

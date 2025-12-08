@@ -1,4 +1,6 @@
-﻿if (args.Length < 2)
+﻿using AdventOfCode;
+
+if (args.Length < 2)
 {
     Console.Error.WriteLine("Usage: aoc <year> <day>");
     return;
