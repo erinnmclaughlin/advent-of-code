@@ -9,7 +9,7 @@ public sealed class Day08() : AdventDay(2025, 8)
         private readonly HashSet<JunctionBox> _junctions = [];
         public IReadOnlySet<JunctionBox> Junctions => _junctions;
 
-        public void AddJunction(JunctionBox box)
+        public void Attach(JunctionBox box)
         {
             box.Circuit._junctions.Remove(box);
             box.Circuit = this;
@@ -26,12 +26,12 @@ public sealed class Day08() : AdventDay(2025, 8)
         {
             Position = (x, y, z);
             Circuit = new Circuit();
-            Circuit.AddJunction(this);
+            Circuit.Attach(this);
         }
 
         public void ConnectTo(JunctionBox other)
         {
-            Circuit.Junctions.ToList().ForEach(other.Circuit.AddJunction);
+            Circuit.Junctions.ToList().ForEach(other.Circuit.Attach);
         }
         
         public float GetDistanceTo(JunctionBox other)
@@ -54,7 +54,8 @@ public sealed class Day08() : AdventDay(2025, 8)
     {
         // TODO: Solve parts 1 and 2 together in same loop
 
-        var circuits = ProcessCircuits(input, 1000);
+        var positions = ParseInput(input).ToArray();
+        var circuits = ProcessCircuits(positions, 1000);
         var part1 = GetProduct(circuits);
         var part2 = MergeIntoOneCircuit(input);
         
@@ -90,10 +91,9 @@ public sealed class Day08() : AdventDay(2025, 8)
         return product;
     }
 
-    public static Circuit[] ProcessCircuits(string input, int steps)
+    public static Circuit[] ProcessCircuits(JunctionBox[] positions, int steps)
     {
         var pairsProcessed = 0;
-        var positions = ParseInput(input).ToArray();
 
         foreach (var (p1, p2) in EnumerateOrderedPairs(positions))
         {

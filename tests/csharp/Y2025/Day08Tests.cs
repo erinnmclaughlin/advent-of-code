@@ -32,7 +32,8 @@ public sealed class Day08Tests
     [Fact]
     public void Sample_matches_part_one_problem_statement()
     {
-        var circuits = Day08.ProcessCircuits(Sample, 10);
+        var junctionBoxes = Day08.ParseInput(Sample).ToArray();
+        var circuits = Day08.ProcessCircuits(junctionBoxes, 10);
         var product = Day08.GetProduct(circuits);
         Assert.Equal(40, product);
     }
@@ -70,7 +71,8 @@ public sealed class Day08Tests
     [InlineData(10, 11)]
     public void Test_connection_count(int steps, int expected)
     {
-        var circuits = Day08.ProcessCircuits(Sample, steps);
+        var junctionBoxes = Day08.ParseInput(Sample).ToArray();
+        var circuits = Day08.ProcessCircuits(junctionBoxes, steps);
         Assert.Equal(expected, circuits.Length);
     }
 
@@ -81,7 +83,8 @@ public sealed class Day08Tests
     [InlineData(1, 7)]
     public void Test_junction_count(int junctionCount, int expectedNumCircuits)
     {
-        var circuits = Day08.ProcessCircuits(Sample, 10);
+        var junctionBoxes = Day08.ParseInput(Sample).ToArray();
+        var circuits = Day08.ProcessCircuits(junctionBoxes, 10);
         Assert.Equal(expectedNumCircuits, circuits.Count(c => c.Junctions.Count == junctionCount));
     }
 }
