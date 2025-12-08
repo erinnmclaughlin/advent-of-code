@@ -51,17 +51,17 @@ public sealed class Day08Tests
         var junctionBoxes = Day08.ParseInput(Sample).ToArray();
         var ordered = Day08.EnumerateOrderedPairs(junctionBoxes).Take(5).ToList();
         
-        Assert.Equal("<162, 817, 812>", ordered[0].Box1.ToString());
-        Assert.Equal("<425, 690, 689>", ordered[0].Box2.ToString());
+        Assert.Equal("<162, 817, 812>", ordered[0].Box1.GetVector3().ToString());
+        Assert.Equal("<425, 690, 689>", ordered[0].Box2.GetVector3().ToString());
         
-        Assert.Equal("<162, 817, 812>", ordered[1].Box1.ToString());
-        Assert.Equal("<431, 825, 988>", ordered[1].Box2.ToString());
+        Assert.Equal("<162, 817, 812>", ordered[1].Box1.GetVector3().ToString());
+        Assert.Equal("<431, 825, 988>", ordered[1].Box2.GetVector3().ToString());
         
-        Assert.Equal("<906, 360, 560>", ordered[2].Box1.ToString());
-        Assert.Equal("<805, 96, 715>", ordered[2].Box2.ToString());
+        Assert.Equal("<906, 360, 560>", ordered[2].Box1.GetVector3().ToString());
+        Assert.Equal("<805, 96, 715>", ordered[2].Box2.GetVector3().ToString());
         
-        Assert.Equal("<431, 825, 988>", ordered[3].Box1.ToString());
-        Assert.Equal("<425, 690, 689>", ordered[3].Box2.ToString());
+        Assert.Equal("<431, 825, 988>", ordered[3].Box1.GetVector3().ToString());
+        Assert.Equal("<425, 690, 689>", ordered[3].Box2.GetVector3().ToString());
     }
     
     [Theory]
