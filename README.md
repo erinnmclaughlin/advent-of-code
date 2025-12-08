@@ -3,7 +3,7 @@
 This repository contains my Advent of Code solutions.
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/erinnmclaughlin/advent-of-code/ci)
-![Codecov](https://img.shields.io/codecov/c/github/erinnmclaughlin/advent-of-code)
+[![codecov](https://codecov.io/gh/erinnmclaughlin/advent-of-code/graph/badge.svg?token=mErAFxucHi)](https://codecov.io/gh/erinnmclaughlin/advent-of-code)
 
 ### Languages
 [C#](csharp) | [F#](fsharp) | [Python](python)
