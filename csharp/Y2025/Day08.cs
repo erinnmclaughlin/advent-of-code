@@ -57,30 +57,24 @@ public sealed class Day08() : AdventDay(2025, 8)
         return biggest.Skip(1).Aggregate(biggest[0], (current, b) => current * b);
     }
 
-    public static IEnumerable<(JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(string input)
-    {
-        var positions = ParseInput(input).ToArray();
-        return EnumeratePairs(positions);
-    }
-    
-    private static IEnumerable<(JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(JunctionBox[] positions)
+    public static IEnumerable<(JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(JunctionBox[] positions)
     {
         var pairs = new HashSet<(JunctionBox, JunctionBox)>();
         
-        foreach (var position in positions)
+        foreach (var p1 in positions)
         {
-            foreach (var other in positions)
+            foreach (var p2 in positions)
             {
-                if (other.Circuit != position.Circuit)
+                if (p2.Circuit != p1.Circuit)
                 {
-                    if (pairs.Add((position, other)) && pairs.Add((other, position)))
-                        yield return (position, other);
+                    if (pairs.Add((p1, p2)) && pairs.Add((p2, p1)))
+                        yield return (p1, p2);
                 }
             }
         }
     }
 
-    private static IEnumerable<JunctionBox> ParseInput(string input)
+    public static IEnumerable<JunctionBox> ParseInput(string input)
     {
         return InputHelper.GetLines(input).Select(ParseLine);
     }
