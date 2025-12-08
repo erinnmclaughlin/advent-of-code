@@ -13,27 +13,13 @@ public sealed class Day06() : AdventDay(2025, 6)
         return (part1, part2);
     }
 
-    private static long SolvePartOne(string[] lines, char[] operators)
-    {
-        var sum = 0L;
-
-        for (var i = 0; i < operators.Length; i++)
-        {
-            var op = operators[i];
-            long? columnResult = null;
-
-            foreach (var line in lines[..^1])
-            {
-                var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                var number = int.Parse(parts[i].Trim());
-                columnResult = DoOperation(columnResult, number, op);
-            }
-
-            sum += columnResult ?? 0;
-        }
-
-        return sum;
-    }
+    private static long SolvePartOne(string[] lines, char[] operators) => operators
+        .Select((t, i) => 
+            lines[..^1]
+                .Select(line => line.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                .Select(parts => int.Parse(parts[i].Trim()))
+                .Aggregate<int, long?>(null, (current, number) => DoOperation(current, number, t)) ?? 0)
+        .Sum();
 
     private static long SolvePartTwo(string[] lines, char[] operators)
     {

@@ -8,7 +8,7 @@ public sealed class Day04() : AdventDay(2025, 4)
         var grid = PaperRollGrid.Parse(lines);
 
         var totalCount = 0;
-        int initialRemovedCount = grid.RemoveRemovableRolls();
+        var initialRemovedCount = grid.RemoveRemovableRolls();
         var lastRemovedCount = initialRemovedCount;
 
         while (lastRemovedCount > 0)

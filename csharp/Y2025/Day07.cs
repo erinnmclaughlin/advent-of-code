@@ -5,11 +5,7 @@ public sealed class Day07() : AdventDay(2025, 7)
     public override AdventDaySolution Solve(string input)
     {
         var lines = InputHelper.GetLines(input);
-
-        var part1 = SolvePartOne(lines);
-        var part2 = SolvePartTwo(lines);
-
-        return (part1, part2);
+        return (SolvePartOne(lines), SolvePartTwo(lines));
     }
 
     private static long SolvePartOne(string[] lines)
@@ -48,7 +44,7 @@ public sealed class Day07() : AdventDay(2025, 7)
         return CountPossiblePaths(lines[0].IndexOf('S'), 1, lines, []);
     }
 
-    private static long CountPossiblePaths(int col, int row, string[] map, Dictionary<(int Col, int Row), long> cache )
+    private static long CountPossiblePaths(int col, int row, string[] map, Dictionary<(int Col, int Row), long> cache)
     {
         if (row >= map.Length - 1)
             return 1;
