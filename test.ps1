@@ -1,4 +1,8 @@
 #!/usr/bin/env pwsh
+param(
+    # Which languages to test; default is all
+    [string[]] $Langs = @("csharp", "fsharp", "python")
+)
 
 $ErrorActionPreference = "Stop"
 
@@ -12,58 +16,64 @@ $repoRoot = Resolve-Path $PSScriptRoot
 # -----------------------------
 # C# Tests
 # -----------------------------
-$csharpTests = Join-Path $repoRoot "tests/csharp/AdventOfCode.CSharp.Tests.csproj"
-
-if (Test-Path $csharpTests) {
-    Write-Host ""
-    Write-Host ">>> Running C# tests"
-    dotnet test $csharpTests `
-        --collect:"XPlat Code Coverage" `
-        --settings "./.runsettings"
-} else {
-    Write-Warning "C# tests not found, skipping"
+if ($Langs -contains "csharp") {
+    $csharpTests = Join-Path $repoRoot "tests/csharp/AdventOfCode.CSharp.Tests.csproj"
+    
+    if (Test-Path $csharpTests) {
+        Write-Host ""
+        Write-Host ">>> Running C# tests"
+        dotnet test $csharpTests `
+            --collect:"XPlat Code Coverage" `
+            --settings "./.runsettings"
+    } else {
+        Write-Warning "C# tests not found, skipping"
+    }
 }
 
 # -----------------------------
 # F# Tests
 # -----------------------------
-$fsharpTests = Join-Path $repoRoot "tests/fsharp/AdventOfCode.FSharp.Tests.fsproj"
-
-if (Test-Path $fsharpTests) {
-    Write-Host ""
-    Write-Host ">>> Running F# tests"
-    dotnet test $fsharpTests `
-        --collect:"XPlat Code Coverage" `
-        --settings "./.runsettings"
-} else {
-    Write-Warning "F# tests not found, skipping"
+if ($Langs -contains "fsharp") {
+    $fsharpTests = Join-Path $repoRoot "tests/fsharp/AdventOfCode.FSharp.Tests.fsproj"
+    
+    if (Test-Path $fsharpTests) {
+        Write-Host ""
+        Write-Host ">>> Running F# tests"
+        dotnet test $fsharpTests `
+            --collect:"XPlat Code Coverage" `
+            --settings "./.runsettings"
+    } else {
+        Write-Warning "F# tests not found, skipping"
+    }
 }
 
 # -----------------------------
 # Python Tests
 # -----------------------------
-$pythonRoot = Join-Path $repoRoot "python"
-$pytestPath = Join-Path $repoRoot "tests/python"
-
-$hasPython = Test-Path $pythonRoot
-$hasPyTests = Test-Path $pytestPath
-
-if ($hasPython -and $hasPyTests) {
-    Write-Host ""
-    Write-Host ">>> Running Python tests"
-
-    Push-Location $pythonRoot
-    try {
-        python -m pytest ../tests/python `
-            --cov=. `
-            --cov-report=xml `
-            --cov-report=term
+if ($Langs -contains "python") {
+    $pythonRoot = Join-Path $repoRoot "python"
+    $pytestPath = Join-Path $repoRoot "tests/python"
+    
+    $hasPython = Test-Path $pythonRoot
+    $hasPyTests = Test-Path $pytestPath
+    
+    if ($hasPython -and $hasPyTests) {
+        Write-Host ""
+        Write-Host ">>> Running Python tests"
+    
+        Push-Location $pythonRoot
+        try {
+            python -m pytest ../tests/python `
+                --cov=. `
+                --cov-report=xml `
+                --cov-report=term
+        }
+        finally {
+            Pop-Location
+        }
+    } else {
+        Write-Warning "Python tests not found, skipping"
     }
-    finally {
-        Pop-Location
-    }
-} else {
-    Write-Warning "Python tests not found, skipping"
 }
 
 Write-Host ""
