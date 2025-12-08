@@ -15,6 +15,14 @@ public sealed class Day08() : AdventDay(2025, 8)
         return (part1, part2);
     }
     
+    public static IEnumerable<JunctionBox> ParseInput(string input) => InputHelper
+        .GetLines(input)
+        .Select(line =>
+        {
+            var parts = line.Split(',').Select(int.Parse).ToArray();
+            return new JunctionBox(parts[0], parts[1], parts[2]);
+        });
+    
     public static long MergeIntoOneCircuit(string input)
     {
         var junctionBoxes = ParseInput(input).ToArray();
@@ -81,17 +89,6 @@ public sealed class Day08() : AdventDay(2025, 8)
         }
     }
 
-    public static IEnumerable<JunctionBox> ParseInput(string input)
-    {
-        return InputHelper.GetLines(input).Select(ParseLine);
-    }
-    
-    private static JunctionBox ParseLine(string line)
-    {
-        var parts = line.Split(',').Select(int.Parse).ToArray();
-        return new JunctionBox(parts[0], parts[1], parts[2]);
-    }
-
     public sealed class JunctionBox
     {
         public Circuit Circuit { get; set; }
@@ -104,24 +101,24 @@ public sealed class Day08() : AdventDay(2025, 8)
             Circuit.AddJunction(this);
         }
 
-        public override string ToString()
+        public void ConnectTo(JunctionBox other)
         {
-            return GetVector3().ToString();
+            Circuit.Junctions.ToList().ForEach(other.Circuit.AddJunction);
         }
         
-        public Vector3 GetVector3() => new(Position.X, Position.Y, Position.Z);
-
         public float GetDistanceTo(JunctionBox other)
         {
             return Vector3.Distance(GetVector3(), other.GetVector3());
         }
-
-        public void ConnectTo(JunctionBox other)
+        
+        public override string ToString()
         {
-            foreach (var junction in other.Circuit.Junctions.ToList())
-            {
-                Circuit.AddJunction(junction);
-            }
+            return GetVector3().ToString();
+        }
+
+        private Vector3 GetVector3()
+        {
+            return new Vector3(Position.X, Position.Y, Position.Z);
         }
     }
 
