@@ -13,9 +13,9 @@ public sealed class Day03 : IAdventDay
         return (part1, part2);
     }
 
-    private IEnumerable<List<(int Value, int Position)>> ParseInput(string input) => input
-        .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
-        .Select(line => line.Select((c, i) => (int.Parse(c.ToString()), i)).ToList());
+    private IEnumerable<List<(int Value, int Position)>> ParseInput(string input) => InputHelper
+       .GetLines(input)
+       .Select(line => line.Select((c, i) => (int.Parse(c.ToString()), i)).ToList());
 
     private static long Solve(List<(int Value, int Position)> digits, int targetDigitCount)
     {

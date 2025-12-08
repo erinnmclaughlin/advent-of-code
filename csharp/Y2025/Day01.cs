@@ -6,7 +6,7 @@ public sealed class Day01() : AdventDay2025(1)
     { 
         var (current, part1, part2) = (50, 0, 0);
 
-        foreach (var line in input.Split('\n', StringSplitOptions.TrimEntries))
+        foreach (var line in InputHelper.GetLines(input))
         {
             var increment = line[0] is 'L' ? -1 : 1;
             var ticks = int.Parse(line[1..]);

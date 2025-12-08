@@ -7,7 +7,7 @@ public sealed class Day06 : IAdventDay
 
     public AdventDaySolution Solve(string input)
     {
-        var lines = input.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
+        var lines = InputHelper.GetLines(input);
         var operators = lines[^1].Where(c => c is not ' ').ToArray();
 
         var part1 = SolvePartOne(lines, operators);
@@ -32,7 +32,7 @@ public sealed class Day06 : IAdventDay
                 columnResult = DoOperation(columnResult, number, op);
             }
 
-            sum += (columnResult ?? 0);
+            sum += columnResult ?? 0;
         }
 
         return sum;

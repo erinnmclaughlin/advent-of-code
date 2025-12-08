@@ -7,11 +7,7 @@ public sealed class Day04 : IAdventDay
 
     public AdventDaySolution Solve(string input)
     {
-        var lines = input.Split(
-            ['\r', '\n'],
-            StringSplitOptions.RemoveEmptyEntries
-        );
-
+        var lines = InputHelper.GetLines(input);
         var grid = PaperRollGrid.Parse(lines);
 
         var totalCount = 0;

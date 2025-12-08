@@ -33,7 +33,7 @@ public sealed class Day05 : IAdventDay
         var ranges = new List<Range>();
         var ids = new List<long>();
 
-        foreach (var line in input.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
+        foreach (var line in InputHelper.GetNonEmptyLines(input))
         {
             if (line.Contains('-'))
             {
