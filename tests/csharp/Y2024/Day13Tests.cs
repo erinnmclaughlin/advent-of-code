@@ -1,8 +1,10 @@
+using AdventOfCode.Y2024;
+
 namespace AdventOfCode.Tests.Y2024;
 
 public sealed class Day13Tests
 {
-    private readonly IAdventDay _solver = SolverRegistry.Get(2024, 13);
+    private readonly Day13 _solver = new();
 
     private const string Sample = """
     Button A: X+94, Y+34

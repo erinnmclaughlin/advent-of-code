@@ -136,11 +136,13 @@ public sealed class Day$dayPadded() : AdventDay($Year, $Day)
     $csTestFile = Join-Path $csTestDir "Day${dayPadded}Tests.cs"
 
     $csTestContent = @"
+using AdventOfCode.Y$Year;
+
 namespace AdventOfCode.Tests.Y$Year;
 
 public class Day${dayPadded}Tests
 {
-    private readonly IAdventDay _solver = SolverRegistry.Get($Year, $Day);
+    private readonly Day${dayPadded} _solver = new();
 
     private const string Sample = """
     REPLACE THIS WITH SAMPLE INPUT

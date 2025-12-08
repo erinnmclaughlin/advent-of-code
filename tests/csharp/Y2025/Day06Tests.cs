@@ -1,8 +1,10 @@
+using AdventOfCode.Y2025;
+
 namespace AdventOfCode.Tests.Y2025;
 
 public sealed class Day06Tests
 {
-    private readonly IAdventDay _solver = SolverRegistry.Get(2025, 6);
+    private readonly Day06 _solver = new();
 
     private const string Sample = """
     123 328  51 64 

@@ -14,7 +14,7 @@ if (!int.TryParse(args[0], out var year) ||
 }
 
 // Resolve solver
-IAdventDay solver;
+AdventDay solver;
 try
 {
     solver = SolverRegistry.Get(year, day);

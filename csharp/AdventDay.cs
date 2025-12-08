@@ -1,6 +1,6 @@
 namespace AdventOfCode;
 
-public abstract class AdventDay(int year, int day) : IAdventDay
+public abstract class AdventDay(int year, int day)
 {
     public int Day { get; } = day;
     public int Year { get; } = year;
