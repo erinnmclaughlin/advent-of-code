@@ -4,10 +4,56 @@ namespace AdventOfCode.Y2025;
 
 public sealed class Day08() : AdventDay(2025, 8)
 {
-    // TODO: Solve parts 1 and 2 together in same loop
+    public sealed class Circuit
+    {
+        private readonly HashSet<JunctionBox> _junctions = [];
+        public IReadOnlySet<JunctionBox> Junctions => _junctions;
+
+        public void AddJunction(JunctionBox box)
+        {
+            box.Circuit._junctions.Remove(box);
+            box.Circuit = this;
+            _junctions.Add(box);
+        }
+    }
+    
+    public sealed class JunctionBox
+    {
+        public Circuit Circuit { get; set; }
+        public (int X, int Y, int Z) Position { get; }
+        
+        public JunctionBox(int x, int y, int z)
+        {
+            Position = (x, y, z);
+            Circuit = new Circuit();
+            Circuit.AddJunction(this);
+        }
+
+        public void ConnectTo(JunctionBox other)
+        {
+            Circuit.Junctions.ToList().ForEach(other.Circuit.AddJunction);
+        }
+        
+        public float GetDistanceTo(JunctionBox other)
+        {
+            return Vector3.Distance(GetVector3(), other.GetVector3());
+        }
+        
+        public override string ToString()
+        {
+            return GetVector3().ToString();
+        }
+
+        private Vector3 GetVector3()
+        {
+            return new Vector3(Position.X, Position.Y, Position.Z);
+        }
+    }
     
     public override AdventDaySolution Solve(string input)
     {
+        // TODO: Solve parts 1 and 2 together in same loop
+
         var circuits = ProcessCircuits(input, 1000);
         var part1 = GetProduct(circuits);
         var part2 = MergeIntoOneCircuit(input);
@@ -52,9 +98,8 @@ public sealed class Day08() : AdventDay(2025, 8)
         foreach (var (p1, p2) in EnumerateOrderedPairs(positions))
         {
             p1.ConnectTo(p2);
-            pairsProcessed++;
             
-            if (pairsProcessed == steps)
+            if (++pairsProcessed == steps)
                 break;
         }
         
@@ -76,62 +121,10 @@ public sealed class Day08() : AdventDay(2025, 8)
     {
         var pairs = new HashSet<(JunctionBox, JunctionBox)>();
         
-        foreach (var p1 in positions)
+        foreach (var (p1, p2) in positions.SelectMany(p1 => positions.Select(p2 => (p1, p2))))
         {
-            foreach (var p2 in positions)
-            {
-                if (p2.Circuit != p1.Circuit)
-                {
-                    if (pairs.Add((p1, p2)) && pairs.Add((p2, p1)))
-                        yield return (p1, p2);
-                }
-            }
-        }
-    }
-
-    public sealed class JunctionBox
-    {
-        public Circuit Circuit { get; set; }
-        public (int X, int Y, int Z) Position { get; }
-        
-        public JunctionBox(int x, int y, int z)
-        {
-            Position = (x, y, z);
-            Circuit = new Circuit();
-            Circuit.AddJunction(this);
-        }
-
-        public void ConnectTo(JunctionBox other)
-        {
-            Circuit.Junctions.ToList().ForEach(other.Circuit.AddJunction);
-        }
-        
-        public float GetDistanceTo(JunctionBox other)
-        {
-            return Vector3.Distance(GetVector3(), other.GetVector3());
-        }
-        
-        public override string ToString()
-        {
-            return GetVector3().ToString();
-        }
-
-        private Vector3 GetVector3()
-        {
-            return new Vector3(Position.X, Position.Y, Position.Z);
-        }
-    }
-
-    public sealed class Circuit
-    {
-        private readonly HashSet<JunctionBox> _junctions = [];
-        public IReadOnlySet<JunctionBox> Junctions => _junctions;
-
-        public void AddJunction(JunctionBox box)
-        {
-            box.Circuit._junctions.Remove(box);
-            box.Circuit = this;
-            _junctions.Add(box);
+            if (p1 != p2 && pairs.Add((p1, p2)) && pairs.Add((p2, p1)))
+                yield return (p1, p2);
         }
     }
 }
