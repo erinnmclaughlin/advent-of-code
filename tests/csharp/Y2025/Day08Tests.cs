@@ -47,19 +47,19 @@ public sealed class Day08Tests
     [Fact]
     public void Test_sort_order()
     {
-        var ordered = Day08.EnumeratePairs(Sample).OrderBy(x => x.Distance).Take(5).ToList();
+        var ordered = Day08.EnumeratePairs(Sample).OrderBy(x => x.Box1.GetDistanceTo(x.Box2)).Take(5).ToList();
         
-        Assert.Equal("<162, 817, 812>", ordered[0].Item2.ToString());
-        Assert.Equal("<425, 690, 689>", ordered[0].Item3.ToString());
+        Assert.Equal("<162, 817, 812>", ordered[0].Box1.ToString());
+        Assert.Equal("<425, 690, 689>", ordered[0].Box2.ToString());
         
-        Assert.Equal("<162, 817, 812>", ordered[1].Item2.ToString());
-        Assert.Equal("<431, 825, 988>", ordered[1].Item3.ToString());
+        Assert.Equal("<162, 817, 812>", ordered[1].Box1.ToString());
+        Assert.Equal("<431, 825, 988>", ordered[1].Box2.ToString());
         
-        Assert.Equal("<906, 360, 560>", ordered[2].Item2.ToString());
-        Assert.Equal("<805, 96, 715>", ordered[2].Item3.ToString());
+        Assert.Equal("<906, 360, 560>", ordered[2].Box1.ToString());
+        Assert.Equal("<805, 96, 715>", ordered[2].Box2.ToString());
         
-        Assert.Equal("<431, 825, 988>", ordered[3].Item2.ToString());
-        Assert.Equal("<425, 690, 689>", ordered[3].Item3.ToString());
+        Assert.Equal("<431, 825, 988>", ordered[3].Box1.ToString());
+        Assert.Equal("<425, 690, 689>", ordered[3].Box2.ToString());
     }
     
     [Theory]

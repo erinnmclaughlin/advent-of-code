@@ -17,17 +17,17 @@ public sealed class Day08() : AdventDay(2025, 8)
     
     public static long MergeIntoOneCircuit(string input)
     {
-        var positions = ParseInput(input).ToArray();
-        var circuits = positions.Select(x => x.Circuit).ToHashSet();
+        var junctionBoxes = ParseInput(input).ToArray();
+        var circuits = junctionBoxes.Select(x => x.Circuit).ToHashSet();
 
-        foreach (var (_, p1, p2) in EnumeratePairs(positions).OrderBy(x => x.Distance))
+        foreach (var (p1, p2) in EnumeratePairs(junctionBoxes).OrderBy(x => x.Box1.GetDistanceTo(x.Box2)))
         {
             p1.ConnectTo(p2);
             circuits.RemoveWhere(c => c.Junctions.Count == 0);
             
             if (circuits.Count == 1)
             {
-                return (long)p1.Position.X * (long)p2.Position.X;
+                return Math.BigMul(p1.Position.X, p2.Position.X);
             }
         }
 
@@ -39,7 +39,7 @@ public sealed class Day08() : AdventDay(2025, 8)
         var pairsProcessed = 0;
         var positions = ParseInput(input).ToArray();
 
-        foreach (var (_, p1, p2) in EnumeratePairs(positions).OrderBy(x => x.Distance))
+        foreach (var (p1, p2) in EnumeratePairs(positions).OrderBy(x => x.Box1.GetDistanceTo(x.Box2)))
         {
             p1.ConnectTo(p2);
             pairsProcessed++;
@@ -57,13 +57,13 @@ public sealed class Day08() : AdventDay(2025, 8)
         return biggest.Skip(1).Aggregate(biggest[0], (current, b) => current * b);
     }
 
-    public static IEnumerable<(float Distance, JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(string input)
+    public static IEnumerable<(JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(string input)
     {
         var positions = ParseInput(input).ToArray();
         return EnumeratePairs(positions);
     }
     
-    private static IEnumerable<(float Distance, JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(JunctionBox[] positions)
+    private static IEnumerable<(JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(JunctionBox[] positions)
     {
         var pairs = new HashSet<(JunctionBox, JunctionBox)>();
         
@@ -71,12 +71,10 @@ public sealed class Day08() : AdventDay(2025, 8)
         {
             foreach (var other in positions)
             {
-                var d = position.GetDistanceTo(other);
-
                 if (other.Circuit != position.Circuit)
                 {
                     if (pairs.Add((position, other)) && pairs.Add((other, position)))
-                        yield return (d, position, other);
+                        yield return (position, other);
                 }
             }
         }
@@ -96,23 +94,25 @@ public sealed class Day08() : AdventDay(2025, 8)
     public sealed class JunctionBox
     {
         public Circuit Circuit { get; set; }
-        public Vector3 Position { get; }
+        public (int X, int Y, int Z) Position { get; }
         
         public JunctionBox(int x, int y, int z)
         {
-            Position = new Vector3(x, y, z);
+            Position = (x, y, z);
             Circuit = new Circuit();
             Circuit.AddJunction(this);
         }
 
         public override string ToString()
         {
-            return Position.ToString();
+            return GetVector3().ToString();
         }
+        
+        public Vector3 GetVector3() => new(Position.X, Position.Y, Position.Z);
 
         public float GetDistanceTo(JunctionBox other)
         {
-            return Vector3.Distance(Position, other.Position);
+            return Vector3.Distance(GetVector3(), other.GetVector3());
         }
 
         public void ConnectTo(JunctionBox other)
