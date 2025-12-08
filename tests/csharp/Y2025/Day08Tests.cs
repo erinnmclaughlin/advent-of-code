@@ -49,7 +49,7 @@ public sealed class Day08Tests(ITestOutputHelper output)
     [Fact]
     public void Test_sort_order()
     {
-        var ordered = Day08.EnumerateByDistance(Sample).OrderBy(x => x.Item1).Take(5).ToList();
+        var ordered = Day08.EnumeratePairs(Sample).OrderBy(x => x.Distance).Take(5).ToList();
         
         Assert.Equal("<162, 817, 812>", ordered[0].Item2.ToString());
         Assert.Equal("<425, 690, 689>", ordered[0].Item3.ToString());

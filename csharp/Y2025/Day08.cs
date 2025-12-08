@@ -117,13 +117,13 @@ public sealed class Day08() : AdventDay(2025, 8)
         return circuits.Select(x => (long)x.Junctions.Count).OrderDescending().Take(take).ToList();
     }
 
-    public static IEnumerable<(float, JunctionBox, JunctionBox)> EnumerateByDistance(string input)
+    public static IEnumerable<(float Distance, JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(string input)
     {
         var positions = ParseInput(input).ToArray();
-        return EnumerateByDistance(positions);
+        return EnumeratePairs(positions);
     }
     
-    public static IEnumerable<(float, JunctionBox, JunctionBox)> EnumerateByDistance(JunctionBox[] positions)
+    public static IEnumerable<(float Distance, JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(JunctionBox[] positions)
     {
         var pairs = new HashSet<(JunctionBox, JunctionBox)>();
         
@@ -147,7 +147,7 @@ public sealed class Day08() : AdventDay(2025, 8)
         var connectionsMade = 0;
         var positions = ParseInput(input).ToArray();
 
-        foreach (var (_, p1, p2) in EnumerateByDistance(positions).OrderBy(x => x.Item1))
+        foreach (var (_, p1, p2) in EnumeratePairs(positions).OrderBy(x => x.Distance))
         {
             if (p1.Circuit != p2.Circuit)
             {
