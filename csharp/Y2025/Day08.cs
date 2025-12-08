@@ -19,19 +19,21 @@ public sealed class Day08() : AdventDay(2025, 8)
     {
         var junctionBoxes = ParseInput(input).ToArray();
         var circuits = junctionBoxes.Select(x => x.Circuit).ToHashSet();
+        long product = -1;
 
-        foreach (var (p1, p2) in EnumeratePairs(junctionBoxes).OrderBy(x => x.Box1.GetDistanceTo(x.Box2)))
+        foreach (var (p1, p2) in EnumerateOrderedPairs(junctionBoxes))
         {
             p1.ConnectTo(p2);
             circuits.RemoveWhere(c => c.Junctions.Count == 0);
             
             if (circuits.Count == 1)
             {
-                return Math.BigMul(p1.Position.X, p2.Position.X);
+                product = Math.BigMul(p1.Position.X, p2.Position.X);
+                break;
             }
         }
 
-        return -1;
+        return product;
     }
 
     public static Circuit[] ProcessCircuits(string input, int steps)
@@ -39,7 +41,7 @@ public sealed class Day08() : AdventDay(2025, 8)
         var pairsProcessed = 0;
         var positions = ParseInput(input).ToArray();
 
-        foreach (var (p1, p2) in EnumeratePairs(positions).OrderBy(x => x.Box1.GetDistanceTo(x.Box2)))
+        foreach (var (p1, p2) in EnumerateOrderedPairs(positions))
         {
             p1.ConnectTo(p2);
             pairsProcessed++;
@@ -57,7 +59,12 @@ public sealed class Day08() : AdventDay(2025, 8)
         return biggest.Skip(1).Aggregate(biggest[0], (current, b) => current * b);
     }
 
-    public static IEnumerable<(JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(JunctionBox[] positions)
+    public static IOrderedEnumerable<(JunctionBox Box1, JunctionBox Box2)> EnumerateOrderedPairs(JunctionBox[] positions)
+    {
+        return EnumeratePairs(positions).OrderBy(x => x.Box1.GetDistanceTo(x.Box2));
+    }
+    
+    private static IEnumerable<(JunctionBox Box1, JunctionBox Box2)> EnumeratePairs(JunctionBox[] positions)
     {
         var pairs = new HashSet<(JunctionBox, JunctionBox)>();
         

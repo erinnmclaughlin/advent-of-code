@@ -48,7 +48,7 @@ public sealed class Day08Tests
     public void Test_sort_order()
     {
         var junctionBoxes = Day08.ParseInput(Sample).ToArray();
-        var ordered = Day08.EnumeratePairs(junctionBoxes).OrderBy(x => x.Box1.GetDistanceTo(x.Box2)).Take(5).ToList();
+        var ordered = Day08.EnumerateOrderedPairs(junctionBoxes).Take(5).ToList();
         
         Assert.Equal("<162, 817, 812>", ordered[0].Box1.ToString());
         Assert.Equal("<425, 690, 689>", ordered[0].Box2.ToString());
