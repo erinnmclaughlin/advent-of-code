@@ -2,12 +2,9 @@ using System.Text;
 
 namespace AdventOfCode.Y2024;
 
-public sealed class Day11 : IAdventDay
+public sealed class Day11() : AdventDay(2024, 11)
 {
-    public int Year => 2024;
-    public int Day => 11;
-
-    public AdventDaySolution Solve(string input)
+    public override AdventDaySolution Solve(string input)
     {
         var part1 = CountStones(input, 25);
         var part2 = CountStones(input, 75);

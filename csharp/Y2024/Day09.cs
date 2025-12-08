@@ -1,11 +1,8 @@
 namespace AdventOfCode.Y2024;
 
-public sealed class Day09 : IAdventDay
+public sealed class Day09() : AdventDay(2024, 9)
 {
-    public int Year => 2024;
-    public int Day => 9;
-
-    public AdventDaySolution Solve(string input)
+    public override AdventDaySolution Solve(string input)
     {
         var part1 = input.BuildDisk().SortFragmented().GetCheckSum();
         var part2 = input.BuildDisk().SortUnfragmented().GetCheckSum();

@@ -1,11 +1,8 @@
 namespace AdventOfCode.Y2024;
 
-public sealed class Day08 : IAdventDay
+public sealed class Day08() : AdventDay(2024, 8)
 {
-    public int Year => 2024;
-    public int Day => 8;
-
-    public AdventDaySolution Solve(string input)
+    public override AdventDaySolution Solve(string input)
     {
         var grid = InputHelper.GetLines(input).AsSpan();
 

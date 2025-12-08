@@ -1,6 +1,6 @@
 namespace AdventOfCode.Y2025;
 
-public sealed class Day01() : AdventDay2025(1)
+public sealed class Day01() : AdventDay(2025, 1)
 {
     public override AdventDaySolution Solve(string input)
     { 

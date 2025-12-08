@@ -1,11 +1,8 @@
 namespace AdventOfCode.Y2024;
 
-public sealed class Day07 : IAdventDay
+public sealed class Day07() : AdventDay(2024, 7)
 {
-    public int Year => 2024;
-    public int Day => 7;
-
-    public AdventDaySolution Solve(string input)
+    public override AdventDaySolution Solve(string input)
     {
         var lines = ParseInput(input);
 

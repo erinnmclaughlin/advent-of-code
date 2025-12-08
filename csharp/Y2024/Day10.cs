@@ -2,12 +2,9 @@ namespace AdventOfCode.Y2024;
 
 using Coord = (int Row, int Col);
 
-public sealed class Day10 : IAdventDay
+public sealed class Day10() : AdventDay(2024, 10)
 {
-    public int Year => 2024;
-    public int Day => 10;
-
-    public AdventDaySolution Solve(string input)
+    public override AdventDaySolution Solve(string input)
     {
         var lines = InputHelper.GetLines(input);
         return (SolvePartOne(lines), SolvePartTwo(lines));

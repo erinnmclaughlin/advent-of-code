@@ -1,11 +1,8 @@
 namespace AdventOfCode.Y2025;
 
-public sealed class Day03 : IAdventDay
+public sealed class Day03() : AdventDay(2025, 3)
 {
-    public int Year => 2025;
-    public int Day => 3;
-
-    public AdventDaySolution Solve(string input)
+    public override AdventDaySolution Solve(string input)
     {
         var digits = ParseInput(input).ToList();
         var part1 = digits.Sum(d => Solve(d, 2));

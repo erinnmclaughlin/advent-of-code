@@ -3,12 +3,9 @@ namespace AdventOfCode.Y2024;
 using Button = (long X, long Y);
 using Target = (long X, long Y);
 
-public sealed class Day13 : IAdventDay
+public sealed class Day13() : AdventDay(2024, 13)
 {
-    public int Year => 2024;
-    public int Day => 13;
-
-    public AdventDaySolution Solve(string input)
+    public override AdventDaySolution Solve(string input)
     {
         var fileLines = InputHelper.GetLines(input).AsSpan();
         var part1 = SolvePartOne(fileLines);

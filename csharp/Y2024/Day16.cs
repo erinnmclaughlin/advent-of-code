@@ -1,11 +1,8 @@
 namespace AdventOfCode.Y2024;
 
-public sealed class Day16 : IAdventDay
+public sealed class Day16() : AdventDay(2024, 16)
 {
-    public int Year => 2024;
-    public int Day => 16;
-
-    public AdventDaySolution Solve(string input)
+    public override AdventDaySolution Solve(string input)
     {
         var solutions =  CreateRunner(InputHelper.GetLines(input)).EnumerateSolutions();
 
