@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Text;
 using AdventOfCode.Y2025;
 
@@ -36,35 +35,35 @@ public sealed class Day09Tests(ITestOutputHelper output)
     
     [Theory]
     [InlineData("2,5", "9,7", 24)]
-    public void GetAreaTests(string p1, string p2, long expected)
+    public void GetAreaTests(string c1, string c2, long expected)
     {
-        var point1 = Day09.ParseLine(p1);
-        var point2 = Day09.ParseLine(p2);
-        var area = Day09.GetArea(point1, point2);
+        var cell1 = Day09.GridCell.Parse(c1);
+        var cell2 = Day09.GridCell.Parse(c2);
+        var area = Day09.GetArea(cell1, cell2);
         Assert.Equal(expected, area);
     }
 
     [Fact]
     public void EnumerateEdgesWorks()
     {
-        var points = InputHelper.GetLines(Sample).Select(Day09.ParseLine).ToHashSet();
-        var edgePoints = Day09.EnumerateEdges(points).ToHashSet();
+        var cells = Day09.ParseInput(Sample);
+        var edgeCells = Day09.EnumerateEdges(cells).ToHashSet();
 
-        var minX = points.Min(p => p.X) - 2;
-        var maxX = points.Max(p => p.X) + 2;
-        var minY = points.Min(p => p.Y) - 1;
-        var maxY = points.Max(p => p.Y) + 1;
+        var minX = cells.Min(c => c.X) - 2;
+        var maxX = cells.Max(c => c.X) + 2;
+        var minY = cells.Min(c => c.Y) - 1;
+        var maxY = cells.Max(c => c.Y) + 1;
 
         var sb = new StringBuilder();
         for (var y = minY; y <= maxY; y++)
         {
             for (var x = minX; x <= maxX; x++)
             {
-                var p = new Point(x, y);
+                var c = new Day09.GridCell(x, y);
 
-                if (points.Contains(p))
+                if (cells.Contains(c))
                     sb.Append('#');
-                else if (edgePoints.Contains(p))
+                else if (edgeCells.Contains(c))
                     sb.Append('X');
                 else
                     sb.Append('.');

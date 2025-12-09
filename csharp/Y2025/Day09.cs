@@ -1,63 +1,70 @@
-using System.Drawing;
-
 namespace AdventOfCode.Y2025;
 
 public sealed class Day09() : AdventDay(2025, 9)
 {
     public override AdventDaySolution Solve(string input)
     {
-        var points = InputHelper.GetLines(input).Select(ParseLine).ToHashSet();
-        var maxArea = points.Max(p1 => points.Where(p2 => p2 != p1).Max(p2 => GetArea(p1, p2)));
+        var cells = ParseInput(input);
+        var maxArea = cells.Max(c1 => cells.Where(c2 => c2 != c1).Max(c2 => GetArea(c1, c2)));
         return (maxArea, "");
     }
 
-    public static long GetArea(Point p1, Point p2)
+    public static HashSet<GridCell> ParseInput(string input)
     {
-        var width = Math.Abs(p1.X - p2.X) + 1L;
-        var height = Math.Abs(p1.Y - p2.Y) + 1L;
+        return InputHelper.GetLines(input).Select(GridCell.Parse).ToHashSet();
+    }
+
+    public static long GetArea(GridCell c1, GridCell c2)
+    {
+        var width = Math.Abs(c1.X - c2.X) + 1L;
+        var height = Math.Abs(c1.Y - c2.Y) + 1L;
         return width * height;
     }
 
-    public static Point ParseLine(string line)
+    public static IEnumerable<GridCell> EnumerateEdges(HashSet<GridCell> cells)
     {
-        var parts = line.Split(',');
-        return new Point(int.Parse(parts[0]), int.Parse(parts[1]));
-    }
-
-    public static IEnumerable<Point> EnumerateEdges(HashSet<Point> points)
-    {
-        for (var i = 1; i < points.Count; i++)
+        for (var i = 1; i < cells.Count; i++)
         {
-            var currPoint = points.ElementAt(i);
-            var prevPoint = points.ElementAt(i - 1);
+            var currCell = cells.ElementAt(i);
+            var prevCell = cells.ElementAt(i - 1);
 
-            foreach (var point in EnumeratePointsBetween(currPoint, prevPoint))
-                yield return point;
+            foreach (var cell in currCell.EnumerateCellsUpTo(prevCell))
+                yield return cell;
         }
 
-        foreach (var point in EnumeratePointsBetween(points.First(), points.Last()))
-        {
-            yield return point;
-        }
+        foreach (var cell in cells.First().EnumerateCellsUpTo(cells.Last()))
+            yield return cell;
     }
     
-    public static IEnumerable<Point> EnumeratePointsBetween(Point p1, Point p2)
-    {
-        if (p1.X == p2.X)
-        {
-            var minY = Math.Min(p1.Y, p2.Y);
-            var maxY = Math.Max(p1.Y, p2.Y);
 
-            for (var y = minY; y <= maxY; y++)
-                yield return p1 with { Y = y };
-        }
-        else
+    public sealed record GridCell(int X, int Y)
+    {
+        public static GridCell Parse(string input)
         {
-            var minX = Math.Min(p1.X, p2.X);
-            var maxX = Math.Max(p1.X, p2.X);
+            var parts = input.Split(',');
+            return new GridCell(int.Parse(parts[0]), int.Parse(parts[1]));
+        }
+
+        public IEnumerable<GridCell> EnumerateCellsUpTo(GridCell other)
+        {
+            if (X == other.X)
+            {
+                var minY = Math.Min(Y, other.Y);
+                var maxY = Math.Max(Y, other.Y);
+
+                for (var y = minY; y <= maxY; y++)
+                    yield return this with { Y = y };
+            }
+            else if (Y == other.Y)
+            {
+                var minX = Math.Min(X, other.X);
+                var maxX = Math.Max(X, other.X);
                 
-            for (var x = minX; x <= maxX; x++)
-                yield return p1 with { X = x };
+                for (var x = minX; x <= maxX; x++)
+                    yield return this with { X = x };
+            }
+            
+            throw new ArgumentException("Can only enumerate cells if other cell is in same row or column as this cell.", nameof(other));
         }
     }
 }
