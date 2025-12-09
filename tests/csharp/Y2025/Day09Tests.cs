@@ -48,6 +48,7 @@ public sealed class Day09Tests(ITestOutputHelper output)
     {
         var cell1 = new Day09.GridCell(Col: 7, Row: 1);
         var cell2 = new Day09.GridCell(Col: 7, Row: 3);
+        var cell3 = new Day09.GridCell(Col: 11, Row: 1);
         
         var col = Assert.IsType<Day09.GridCol>(Day09.GetEdge(cell1, cell2));
         Assert.Equal(3, col.Size);
@@ -56,7 +57,6 @@ public sealed class Day09Tests(ITestOutputHelper output)
         Assert.False(col.Contains(new Day09.GridCell(Col: 7, Row: 0)));
         Assert.False(col.Contains(new Day09.GridCell(Col: 7, Row: 4)));
 
-        var cell3 = new Day09.GridCell(Col: 11, Row: 1);
         
         var row = Assert.IsType<Day09.GridRow>(Day09.GetEdge(cell1, cell3));
         Assert.Equal(5, row.Size);
@@ -85,7 +85,6 @@ public sealed class Day09Tests(ITestOutputHelper output)
         Assert.Equal(1, col.Start.Row);
         Assert.Equal(7, col.Start.Col);
         Assert.Equal(7, col.End.Col);
-
     }
 
     [Fact]
@@ -135,5 +134,19 @@ public sealed class Day09Tests(ITestOutputHelper output)
             """;
         
         Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void IntersectsWorks()
+    {
+        var cell1 = new Day09.GridCell(Col: 7, Row: 1);
+        var cell2 = new Day09.GridCell(Col: 7, Row: 3);
+        var cell3 = new Day09.GridCell(Col: 11, Row: 1);
+        
+        var col = Assert.IsType<Day09.GridCol>(Day09.GetEdge(cell1, cell2));
+        var row = Assert.IsType<Day09.GridRow>(Day09.GetEdge(cell1, cell3));
+        
+        Assert.True(col.Intersects(row));
+        Assert.True(row.Intersects(col));
     }
 }

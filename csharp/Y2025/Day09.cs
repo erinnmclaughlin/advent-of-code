@@ -61,6 +61,7 @@ public sealed class Day09() : AdventDay(2025, 9)
     public interface IGridEdge
     {
         bool Contains(GridCell cell);
+        bool Intersects(IGridEdge other);
     }
 
     public sealed record GridCol(GridCell Start, int Size) : IGridEdge
@@ -73,6 +74,17 @@ public sealed class Day09() : AdventDay(2025, 9)
             if (Start.Col != cell.Col) return false;
             return cell.Row >= Start.Row && cell.Row <= (Start.Row + Size - 1);
         }
+
+        public bool Intersects(IGridEdge other)
+        {
+            return EnumerateCells().Any(other.Contains);
+        }
+
+        public IEnumerable<GridCell> EnumerateCells()
+        {
+            for (var i = 0; i < Size; i++)
+                yield return new GridCell(Col: Start.Col, Row: Start.Row + i);
+        }
     }
 
     public sealed record GridRow(GridCell Start, int Size) : IGridEdge
@@ -84,6 +96,17 @@ public sealed class Day09() : AdventDay(2025, 9)
             if (Start == cell) return true;
             if (Start.Row != cell.Row) return false;
             return cell.Col >= Start.Col && cell.Col <= (Start.Col + Size - 1);
+        }
+        
+        public bool Intersects(IGridEdge other)
+        {
+            return EnumerateCells().Any(other.Contains);
+        }
+
+        public IEnumerable<GridCell> EnumerateCells()
+        {
+            for (var i = 0; i < Size; i++)
+                yield return new GridCell(Col: Start.Col + i, Row: Start.Row);
         }
     }
     
