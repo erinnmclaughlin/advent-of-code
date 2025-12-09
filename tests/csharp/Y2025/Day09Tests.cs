@@ -49,11 +49,21 @@ public sealed class Day09Tests(ITestOutputHelper output)
         var cell1 = new Day09.GridCell(Col: 7, Row: 1);
         var cell2 = new Day09.GridCell(Col: 7, Row: 3);
         
-        var edge = Assert.IsType<Day09.GridCol>(Day09.GetEdge(cell1, cell2));
-        Assert.Equal(3, edge.Size);
-        Assert.True(edge.Contains(cell1));
-        Assert.True(edge.Contains(cell2));
+        var col = Assert.IsType<Day09.GridCol>(Day09.GetEdge(cell1, cell2));
+        Assert.Equal(3, col.Size);
+        Assert.True(col.Contains(cell1));
+        Assert.True(col.Contains(cell2));
+        Assert.False(col.Contains(new Day09.GridCell(Col: 7, Row: 0)));
+        Assert.False(col.Contains(new Day09.GridCell(Col: 7, Row: 4)));
+
+        var cell3 = new Day09.GridCell(Col: 11, Row: 1);
         
+        var row = Assert.IsType<Day09.GridRow>(Day09.GetEdge(cell1, cell3));
+        Assert.Equal(5, row.Size);
+        Assert.True(row.Contains(cell1));
+        Assert.True(row.Contains(cell3));
+        Assert.False(row.Contains(new Day09.GridCell(Col: 6, Row: 1)));
+        Assert.False(row.Contains(new Day09.GridCell(Col: 12, Row: 1)));
     }
 
     [Fact]

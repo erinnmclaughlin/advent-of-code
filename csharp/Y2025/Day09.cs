@@ -60,7 +60,6 @@ public sealed class Day09() : AdventDay(2025, 9)
 
     public interface IGridEdge
     {
-        int Size { get; }
         bool Contains(GridCell cell);
     }
 
@@ -94,39 +93,6 @@ public sealed class Day09() : AdventDay(2025, 9)
         {
             var parts = input.Split(',');
             return new GridCell(int.Parse(parts[0]), int.Parse(parts[1]));
-        }
-
-        public IEnumerable<GridCell> EnumerateCellsUpTo(GridCell other)
-        {
-            if (Col == other.Col && Row == other.Row)
-            {
-                yield return this;
-                yield break;
-            }
-            
-            if (Col == other.Col)
-            {
-                var minRow = Math.Min(Row, other.Row);
-                var maxRow = Math.Max(Row, other.Row);
-
-                for (var row = minRow; row <= maxRow; row++)
-                    yield return this with { Row = row };
-
-                yield break;
-            }
-            
-            if (Row == other.Row)
-            {
-                var minCol = Math.Min(Col, other.Col);
-                var maxCol = Math.Max(Col, other.Col);
-                
-                for (var col = minCol; col <= maxCol; col++)
-                    yield return this with { Col = col };
-
-                yield break;
-            }
-            
-            throw new ArgumentException("Can only enumerate cells if other cell is in same row or column as this cell.", nameof(other));
         }
     }
 }
