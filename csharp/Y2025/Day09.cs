@@ -23,19 +23,69 @@ public sealed class Day09() : AdventDay(2025, 9)
         return width * height;
     }
 
-    public static IEnumerable<GridCell> EnumerateEdges(HashSet<GridCell> cells)
+    public static IEnumerable<IGridEdge> EnumerateEdges(HashSet<GridCell> cells)
     {
+        if (cells.Count < 2)
+            throw new ArgumentException("Must have at least two grid cells.", nameof(cells));
+
         for (var i = 1; i < cells.Count; i++)
         {
-            var currCell = cells.ElementAt(i);
-            var prevCell = cells.ElementAt(i - 1);
-
-            foreach (var cell in currCell.EnumerateCellsUpTo(prevCell))
-                yield return cell;
+            yield return GetEdge(cells.ElementAt(i), cells.ElementAt(i - 1));
         }
 
-        foreach (var cell in cells.First().EnumerateCellsUpTo(cells.Last()))
-            yield return cell;
+        yield return GetEdge(cells.Last(), cells.First());
+    }
+
+    public static IGridEdge GetEdge(GridCell currCell, GridCell prevCell)
+    {
+        if (currCell.Col == prevCell.Col)
+        {
+            var startRow = Math.Min(currCell.Row, prevCell.Row);
+            var endRow = Math.Max(currCell.Row, prevCell.Row);
+
+            var size = endRow - startRow + 1;
+            return new GridCol(new GridCell(currCell.Col, startRow), size);
+        }
+        
+        if (currCell.Row == prevCell.Row)
+        {
+            var startCol = Math.Min(currCell.Col, prevCell.Col);
+            var endCol = Math.Max(currCell.Col, prevCell.Col);
+            var size = endCol - startCol + 1;
+            return new GridRow(new GridCell(startCol, currCell.Row), size);
+        }
+
+        throw new InvalidOperationException();
+    }
+
+    public interface IGridEdge
+    {
+        int Size { get; }
+        bool Contains(GridCell cell);
+    }
+
+    public sealed record GridCol(GridCell Start, int Size) : IGridEdge
+    {
+        public GridCell End => new(Col: Start.Col, Row: Start.Row + Size - 1);
+        
+        public bool Contains(GridCell cell)
+        {
+            if (Start == cell) return true;
+            if (Start.Col != cell.Col) return false;
+            return cell.Row >= Start.Row && cell.Row <= (Start.Row + Size - 1);
+        }
+    }
+
+    public sealed record GridRow(GridCell Start, int Size) : IGridEdge
+    {
+        public GridCell End => new(Col: Start.Col + Size - 1, Row: Start.Row);
+        
+        public bool Contains(GridCell cell)
+        {
+            if (Start == cell) return true;
+            if (Start.Row != cell.Row) return false;
+            return cell.Col >= Start.Col && cell.Col <= (Start.Col + Size - 1);
+        }
     }
     
     public sealed record GridCell(int Col, int Row) : AdventCell(Row, Col)

@@ -44,26 +44,61 @@ public sealed class Day09Tests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void GetEdgeWorks()
+    {
+        var cell1 = new Day09.GridCell(Col: 7, Row: 1);
+        var cell2 = new Day09.GridCell(Col: 7, Row: 3);
+        
+        var edge = Assert.IsType<Day09.GridCol>(Day09.GetEdge(cell1, cell2));
+        Assert.Equal(3, edge.Size);
+        Assert.True(edge.Contains(cell1));
+        Assert.True(edge.Contains(cell2));
+        
+    }
+
+    [Fact]
+    public void TestRow()
+    {
+        var row = new Day09.GridRow(new Day09.GridCell(Col: 7, Row: 1), 5);
+        Assert.Equal(5, row.Size);
+        Assert.Equal(1, row.Start.Row);
+        Assert.Equal(1, row.End.Row);
+        Assert.Equal(11, row.End.Col);
+    }
+
+    [Fact]
+    public void TestCol()
+    {
+        var col = new Day09.GridCol(new Day09.GridCell(Col: 7, Row: 1), 3);
+        Assert.Equal(3, col.Size);
+        Assert.Equal(3, col.End.Row);
+        Assert.Equal(1, col.Start.Row);
+        Assert.Equal(7, col.Start.Col);
+        Assert.Equal(7, col.End.Col);
+
+    }
+
+    [Fact]
     public void EnumerateEdgesWorks()
     {
         var cells = Day09.ParseInput(Sample);
-        var edgeCells = Day09.EnumerateEdges(cells).ToHashSet();
+        var edges = Day09.EnumerateEdges(cells).ToHashSet();
 
-        var minX = cells.Min(c => c.Col) - 2;
-        var maxX = cells.Max(c => c.Col) + 2;
-        var minY = cells.Min(c => c.Row) - 1;
-        var maxY = cells.Max(c => c.Row) + 1;
+        var minCol = cells.Min(c => c.Col) - 2;
+        var maxCol = cells.Max(c => c.Col) + 2;
+        var minRow = cells.Min(c => c.Row) - 1;
+        var maxRow = cells.Max(c => c.Row) + 1;
 
         var sb = new StringBuilder();
-        for (var y = minY; y <= maxY; y++)
+        for (var row = minRow; row <= maxRow; row++)
         {
-            for (var x = minX; x <= maxX; x++)
+            for (var col = minCol; col <= maxCol; col++)
             {
-                var c = new Day09.GridCell(x, y);
+                var c = new Day09.GridCell(col, row);
 
                 if (cells.Contains(c))
                     sb.Append('#');
-                else if (edgeCells.Contains(c))
+                else if (edges.Any(e => e.Contains(c)))
                     sb.Append('X');
                 else
                     sb.Append('.');
