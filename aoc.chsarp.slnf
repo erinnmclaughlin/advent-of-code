@@ -1,0 +1,9 @@
+﻿{
+  "solution": {
+    "path": "aoc.slnx",
+    "projects": [
+      "csharp\\AdventOfCode.CSharp.csproj",
+      "tests\\csharp\\AdventOfCode.CSharp.Tests.csproj"
+    ]
+  }
+}
