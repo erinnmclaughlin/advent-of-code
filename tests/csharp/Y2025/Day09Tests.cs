@@ -49,10 +49,10 @@ public sealed class Day09Tests(ITestOutputHelper output)
         var cells = Day09.ParseInput(Sample);
         var edgeCells = Day09.EnumerateEdges(cells).ToHashSet();
 
-        var minX = cells.Min(c => c.X) - 2;
-        var maxX = cells.Max(c => c.X) + 2;
-        var minY = cells.Min(c => c.Y) - 1;
-        var maxY = cells.Max(c => c.Y) + 1;
+        var minX = cells.Min(c => c.Col) - 2;
+        var maxX = cells.Max(c => c.Col) + 2;
+        var minY = cells.Min(c => c.Row) - 1;
+        var maxY = cells.Max(c => c.Row) + 1;
 
         var sb = new StringBuilder();
         for (var y = minY; y <= maxY; y++)

@@ -1,3 +1,5 @@
+using AdventOfCode.Common;
+
 namespace AdventOfCode.Y2024;
 
 public sealed class Day12() : AdventDay(2024, 12)
@@ -23,7 +25,7 @@ public sealed class Day12() : AdventDay(2024, 12)
                 var cell = new Cell(map[i][j], i, j);
                 groupLookup.TryAdd(cell.Label, []);
                 var group = new CellGroup(cell.Label);
-                group.Cells.Add(cell);
+                group.Add(cell);
                 groupLookup[cell.Label].Add(group);
             }
         }
@@ -37,7 +39,7 @@ public sealed class Day12() : AdventDay(2024, 12)
                     if (!kvp.Value[i].CanMergeWith(kvp.Value[j]))
                         continue;
 
-                    kvp.Value[i].Cells.AddRange(kvp.Value[j].Cells);
+                    kvp.Value[i].AddRange(kvp.Value[j].Cells);
                     kvp.Value.RemoveAt(j);
                     break;
                 }
@@ -47,11 +49,13 @@ public sealed class Day12() : AdventDay(2024, 12)
         return groupLookup.SelectMany(x => x.Value).ToList();
     }
     
-    private sealed class CellGroup(char label)
+    private sealed class CellGroup(char label) : AdventCellGroup<Cell>
     {
+        private readonly List<Cell> _cells = [];
+        public override IReadOnlyList<Cell> Cells => _cells;
+        
         private char Label { get; } = label;
-        public List<Cell> Cells { get; } = [];
-
+        
         public bool CanMergeWith(CellGroup other)
         {
             return other != this &&
@@ -59,66 +63,16 @@ public sealed class Day12() : AdventDay(2024, 12)
                    Cells.Any(c => other.Cells.Any(oc => oc.IsAdjacentTo(c)));
         }
 
-        public int GetPerimeter() => Cells.Sum(cell => 4 - Cells.Count(c => c.IsAdjacentTo(cell)));
-
-        public int GetNumberOfSides()
+        public void Add(Cell cell)
         {
-            return CountOuterCorners() + GetInnerCorners();
+            _cells.Add(cell);
         }
 
-        private int CountOuterCorners()
+        public void AddRange(params IEnumerable<Cell> cells)
         {
-            var count = 0;
-            
-            foreach (var cell in Cells)
-            {
-                var top = Cells.FirstOrDefault(c => c.Row == cell.Row - 1 && c.Col == cell.Col);
-                var left = Cells.FirstOrDefault(c => c.Row == cell.Row && c.Col == cell.Col - 1);
-                var bottom = Cells.FirstOrDefault(c => c.Row == cell.Row + 1 && c.Col == cell.Col);
-                var right = Cells.FirstOrDefault(c => c.Row == cell.Row && c.Col == cell.Col + 1);
-
-                if (top is null && left is null) count++;
-                if (left is null && bottom is null) count++;
-                if (bottom is null && right is null) count++;
-                if (right is null && top is null) count++;
-            }
-
-            return count;
-        }
-
-        private int GetInnerCorners()
-        {
-            var count = 0;
-            foreach (var cell in Cells)
-            {
-                var top = Cells.FirstOrDefault(c => c.Row == cell.Row - 1 && c.Col == cell.Col);
-                var left = Cells.FirstOrDefault(c => c.Row == cell.Row && c.Col == cell.Col - 1);
-                var bottom = Cells.FirstOrDefault(c => c.Row == cell.Row + 1 && c.Col == cell.Col);
-                var right = Cells.FirstOrDefault(c => c.Row == cell.Row && c.Col == cell.Col + 1);
-
-                var topLeft = Cells.FirstOrDefault(c => c.Row == cell.Row - 1 && c.Col == cell.Col - 1);
-                var topRight = Cells.FirstOrDefault(c => c.Row == cell.Row - 1 && c.Col == cell.Col + 1);
-                var bottomLeft = Cells.FirstOrDefault(c => c.Row == cell.Row + 1 && c.Col == cell.Col - 1);
-                var bottomRight = Cells.FirstOrDefault(c => c.Row == cell.Row + 1 && c.Col == cell.Col + 1);
-                
-                if (top is not null && left is not null && topLeft is null) count++;
-                if (top is not null && right is not null && topRight is null) count++;
-                if (bottom is not null && left is not null && bottomLeft is null) count++;
-                if (bottom is not null && right is not null && bottomRight is null) count++;
-            }
-
-            return count;
+            _cells.AddRange(cells);
         }
     }
 
-    private sealed class Cell(char label, int row, int col)
-    {
-        public char Label { get; } = label;
-        public int Row { get; } = row;
-        public int Col { get; } = col;
-
-        public bool IsAdjacentTo(Cell other) =>
-            Row == other.Row && Math.Abs(Col - other.Col) == 1 ||
-            Col == other.Col && Math.Abs(Row - other.Row) == 1;
-    }
+    private sealed record Cell(char Label, int Row, int Col) : AdventCell(Row, Col);
 }

@@ -1,3 +1,5 @@
+using AdventOfCode.Common;
+
 namespace AdventOfCode.Y2025;
 
 public sealed class Day09() : AdventDay(2025, 9)
@@ -16,8 +18,8 @@ public sealed class Day09() : AdventDay(2025, 9)
 
     public static long GetArea(GridCell c1, GridCell c2)
     {
-        var width = Math.Abs(c1.X - c2.X) + 1L;
-        var height = Math.Abs(c1.Y - c2.Y) + 1L;
+        var width = Math.Abs(c1.Col - c2.Col) + 1L;
+        var height = Math.Abs(c1.Row - c2.Row) + 1L;
         return width * height;
     }
 
@@ -36,7 +38,7 @@ public sealed class Day09() : AdventDay(2025, 9)
             yield return cell;
     }
     
-    public sealed record GridCell(int X, int Y)
+    public sealed record GridCell(int Col, int Row) : AdventCell(Row, Col)
     {
         public static GridCell Parse(string input)
         {
@@ -46,30 +48,30 @@ public sealed class Day09() : AdventDay(2025, 9)
 
         public IEnumerable<GridCell> EnumerateCellsUpTo(GridCell other)
         {
-            if (X == other.X && Y == other.Y)
+            if (Col == other.Col && Row == other.Row)
             {
                 yield return this;
                 yield break;
             }
             
-            if (X == other.X)
+            if (Col == other.Col)
             {
-                var minY = Math.Min(Y, other.Y);
-                var maxY = Math.Max(Y, other.Y);
+                var minRow = Math.Min(Row, other.Row);
+                var maxRow = Math.Max(Row, other.Row);
 
-                for (var y = minY; y <= maxY; y++)
-                    yield return this with { Y = y };
+                for (var row = minRow; row <= maxRow; row++)
+                    yield return this with { Row = row };
 
                 yield break;
             }
             
-            if (Y == other.Y)
+            if (Row == other.Row)
             {
-                var minX = Math.Min(X, other.X);
-                var maxX = Math.Max(X, other.X);
+                var minCol = Math.Min(Col, other.Col);
+                var maxCol = Math.Max(Col, other.Col);
                 
-                for (var x = minX; x <= maxX; x++)
-                    yield return this with { X = x };
+                for (var col = minCol; col <= maxCol; col++)
+                    yield return this with { Col = col };
 
                 yield break;
             }
