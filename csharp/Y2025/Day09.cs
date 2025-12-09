@@ -36,7 +36,6 @@ public sealed class Day09() : AdventDay(2025, 9)
             yield return cell;
     }
     
-
     public sealed record GridCell(int X, int Y)
     {
         public static GridCell Parse(string input)
@@ -47,6 +46,12 @@ public sealed class Day09() : AdventDay(2025, 9)
 
         public IEnumerable<GridCell> EnumerateCellsUpTo(GridCell other)
         {
+            if (X == other.X && Y == other.Y)
+            {
+                yield return this;
+                yield break;
+            }
+            
             if (X == other.X)
             {
                 var minY = Math.Min(Y, other.Y);
@@ -54,14 +59,19 @@ public sealed class Day09() : AdventDay(2025, 9)
 
                 for (var y = minY; y <= maxY; y++)
                     yield return this with { Y = y };
+
+                yield break;
             }
-            else if (Y == other.Y)
+            
+            if (Y == other.Y)
             {
                 var minX = Math.Min(X, other.X);
                 var maxX = Math.Max(X, other.X);
                 
                 for (var x = minX; x <= maxX; x++)
                     yield return this with { X = x };
+
+                yield break;
             }
             
             throw new ArgumentException("Can only enumerate cells if other cell is in same row or column as this cell.", nameof(other));
