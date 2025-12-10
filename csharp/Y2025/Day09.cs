@@ -19,7 +19,7 @@ public sealed class Day09() : AdventDay(2025, 9)
             if (boundaries.All(s => !s.IsCollidingWith(rectangle)))
             {
                 boundedMax = rectangle.GetArea();
-                return (max, boundedMax);
+                break;
             }
         }
 
