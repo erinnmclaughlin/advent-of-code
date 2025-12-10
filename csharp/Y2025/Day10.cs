@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Text;
 
 namespace AdventOfCode.Y2025;
@@ -15,11 +16,10 @@ public sealed class Day10() : AdventDay(2025, 10)
 
         return ("", "");
     }
-
+    
     public sealed class StateContainer
     {
         public bool[] Target { get; }
-        public bool[] Lights { get; }
         public int[][] Buttons { get; }
         public int[] JoltageRequirements { get; }
 
@@ -27,10 +27,40 @@ public sealed class Day10() : AdventDay(2025, 10)
         {
             Buttons = buttons;
             Target = targetState;
-            Lights = Enumerable.Repeat(false, targetState.Length).ToArray();
             JoltageRequirements = joltageRequirements;
         }
 
+        public int CountFewestSteps()
+        {
+            var initialLightState = Enumerable.Repeat(false, Target.Length);
+            var initialPressedState = Buttons.ToDictionary(b => b, _ => 0);
+            
+            return Buttons.Min(b => CountFewestSteps(initialLightState.ToArray(), b, initialPressedState.ToDictionary()));
+        }
+        
+        public int CountFewestSteps(bool[] state, int[] button, Dictionary<int[], int> pressed)
+        {
+            if (state.SequenceEqual(Target))
+                return pressed.Sum(b => b.Value);
+
+            foreach (var i in button)
+                state[i] = !state[i];
+
+            pressed[button]++;
+
+            var buttons = Buttons.Where(b => b != button && pressed[b] < 2).ToArray();
+
+            if (buttons.Length == 0)
+            {
+                return int.MaxValue;
+            }
+            
+            //if (buttons.Length == 1)
+            //    return CountFewestSteps(state, buttons[0], pressed);
+
+            return buttons.Min(b => CountFewestSteps([..state], b, pressed.ToDictionary()));
+        }
+        
         public static StateContainer Parse(string input)
         {
             var parts = input.Split(' ');

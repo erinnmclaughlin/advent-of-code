@@ -29,15 +29,21 @@ public sealed class Day10Tests
     }
 
     [Fact]
+    public void Get_calculate_lowest_cost()
+    {
+        var lineToParse = InputHelper.GetLines(Sample)[0];
+        var parsed = Day10.StateContainer.Parse(lineToParse);
+        var cost = parsed.CountFewestSteps();
+        Assert.Equal(2, cost);
+    }
+
+    [Fact]
     public void Can_parse_initial_state()
     {
         var lineToParse = InputHelper.GetLines(Sample)[0];
         var parsed = Day10.StateContainer.Parse(lineToParse);
         
         Assert.Equal(4, parsed.Target.Length);
-        Assert.All(parsed.Lights, Assert.False);
-        
-        Assert.Equal(4, parsed.Lights.Length);
         Assert.False(parsed.Target[0]);
         Assert.True(parsed.Target[1]);
         Assert.True(parsed.Target[2]);
