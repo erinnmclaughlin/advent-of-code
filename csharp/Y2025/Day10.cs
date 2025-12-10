@@ -15,6 +15,43 @@ public sealed class Day10() : AdventDay(2025, 10)
         .Select(Instruction.Parse)
         .ToArray();
 
+    public sealed class Machine
+    {
+        public string IndicatorLights { get; private set; }
+        public int[] Joltages { get; private init; }
+
+        public Machine(Instruction instruction) : this(instruction.TargetState.Length)
+        {
+        }
+        
+        public Machine(int size)
+        {
+            IndicatorLights = new string('.', size);
+            Joltages = new int[size];
+        }
+        
+        public void PressButton(int[] button)
+        {
+            var sb = new StringBuilder();
+
+            for (var i = 0; i < IndicatorLights.Length; i++)
+            {
+                if (button.Contains(i))
+                {
+                    sb.Append(IndicatorLights[i] == '.' ? '#' : '.');
+                    Joltages[i]++;
+                }
+                else
+                {
+                    sb.Append(IndicatorLights[i]);
+                }
+                
+            }
+
+            IndicatorLights = sb.ToString();
+        }
+    }
+    
     public sealed class Instruction
     {
         public string EmptyState => new('.', TargetState.Length);

@@ -39,14 +39,37 @@ public sealed class Day10Tests
     [Fact]
     public void Can_parse_initial_state()
     {
-        var lineToParse = InputHelper.GetLines(Sample)[0];
-        var parsed = Day10.Instruction.Parse(lineToParse);
+        var instruction = Day10.ParseInput(Sample)[0];
         
-        Assert.Equal(".##.", parsed.TargetState);
-        Assert.Equivalent(new[] { 3,5,4,7 }, parsed.JoltageRequirements);
+        Assert.Equal(".##.", instruction.TargetState);
+        Assert.Equivalent(new[] { 3,5,4,7 }, instruction.JoltageRequirements);
 
-        Assert.Equal(6, parsed.Buttons.Count);
-        Assert.Equal(new [] { 3 }, parsed.Buttons["3"]);
-        Assert.Equal(new [] { 1, 3 }, parsed.Buttons["1,3"]);
+        Assert.Equal(6, instruction.Buttons.Count);
+        Assert.Equal(new [] { 3 }, instruction.Buttons["3"]);
+        Assert.Equal(new [] { 1, 3 }, instruction.Buttons["1,3"]);
+    }
+
+    [Fact]
+    public void Can_create_machine()
+    {
+        var instruction = Day10.ParseInput(Sample)[0];
+        var machine = new Day10.Machine(instruction);
+        Assert.Equal("....", machine.IndicatorLights);
+        Assert.Equivalent(new[] { 0,0,0,0 }, machine.Joltages);
+    }
+
+    [Fact]
+    public void Can_press_button_on_machine()
+    {
+        var instruction = Day10.ParseInput(Sample)[0];
+        var machine = new Day10.Machine(instruction);
+        
+        machine.PressButton([0, 2]);
+        Assert.Equal("#.#.", machine.IndicatorLights);
+        Assert.Equivalent(new[] { 1, 0, 1, 0 }, machine.Joltages);
+        
+        machine.PressButton([0, 2]);
+        Assert.Equal("....", machine.IndicatorLights);
+        Assert.Equivalent(new[] { 2, 0, 2, 0 }, machine.Joltages);
     }
 }
