@@ -14,6 +14,33 @@ public sealed record GridLine
         End = end;
     }
 
+    public IEnumerable<GridCell> EnumerateCells()
+    {
+        if (IsHorizontal)
+        {
+            var minCol = Math.Min(Start.Col, End.Col);
+            var maxCol = Math.Max(Start.Col, End.Col);
+            
+            for (var col = minCol; col <= maxCol; col++)
+                yield return new GridCell(col, Start.Row);
+
+            yield break;
+        }
+
+        if (IsVertical)
+        {
+            var minRow = Math.Min(Start.Row, End.Row);
+            var maxRow = Math.Max(Start.Row, End.Row);
+            
+            for (var row = minRow; row <= maxRow; row++)
+                yield return new GridCell(Start.Col, row);
+            
+            yield break;
+        }
+        
+        throw new NotImplementedException();
+    }
+
     public bool Contains(GridCell cell)
     {
         if (IsHorizontal)

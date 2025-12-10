@@ -36,19 +36,28 @@ public sealed class GridShape
         if (!BoundingBox.Contains(rectangle))
             return false;
 
-        if (!Contains(rectangle.TopLeft) || 
-            !Contains(rectangle.BottomRight) || 
-            !Contains(rectangle.TopRight) ||
-            !Contains(rectangle.BottomLeft))
-            return false;
-        
         foreach (var corner in EnumerateCorners())
         {
             if (rectangle.Contains(corner) && !rectangle.IsOnEdge(corner))
                 return false;
         }
+        
+        // TODO: check intersections instead of doing this
+        var edgeCells = rectangle.TopEdge.EnumerateCells()
+            .Concat(rectangle.RightEdge.EnumerateCells())
+            .Concat(rectangle.BottomEdge.EnumerateCells())
+            .Concat(rectangle.LeftEdge.EnumerateCells());
+
+        if (edgeCells.AsParallel().Any(c => !Contains(c)))
+            return false;
 
         return true;
+    }
+
+    public bool Contains(GridLine line)
+    {
+        // todo: be more efficient
+        return line.EnumerateCells().AsParallel().All(Contains);
     }
 
     public bool Contains(GridCell cell)
