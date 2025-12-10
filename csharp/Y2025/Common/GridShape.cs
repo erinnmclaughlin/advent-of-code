@@ -54,9 +54,9 @@ public sealed class GridShape
         if (!BoundingBox.Contains(rectangle))
             return false;
 
-        if (!Contains(rectangle.TopLeft) &&
-            !Contains(rectangle.TopRight) &&
-            !Contains(rectangle.BottomLeft) &&
+        if (!Contains(rectangle.TopLeft) ||
+            !Contains(rectangle.TopRight) ||
+            !Contains(rectangle.BottomLeft) ||
             !Contains(rectangle.BottomRight))
             return false;
         
