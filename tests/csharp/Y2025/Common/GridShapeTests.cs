@@ -124,6 +124,55 @@ public sealed class GridShapeTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void Irregular_shape_wicked_irregular_1()
+    {
+        var shape = new GridShape([
+            new GridCell(5, 0),
+            new GridCell(10, 0),
+            new GridCell(10, 5),
+            new GridCell(15, 5),
+            new GridCell(15, 10),
+            new GridCell(10, 10),
+            new GridCell(10, 15),
+            new GridCell(5, 15),
+            new GridCell(5, 10),
+            new GridCell(0, 10),
+            new GridCell(0, 5),
+            new GridCell(5, 5)
+        ]);
+        
+        output.WriteLine(shape.ToString());
+    }
+
+    [Fact]
+    public void Irregular_shape_wicked_irregular_2()
+    {
+        var shape = new GridShape([
+            new GridCell(0, 0),
+            new GridCell(20, 0),
+            new GridCell(20, 20),
+            new GridCell(15, 20),
+            new GridCell(15, 15),
+            new GridCell(5, 15),
+            new GridCell(5, 20),
+            new GridCell(0, 20)
+        ]);
+        
+        output.WriteLine(shape.ToString());
+
+        var rect = new GridRectangle(
+                new GridCell(6, 18),
+                new GridCell(9, 20));
+        
+        output.WriteLine(shape.ToString(rect));
+        Assert.False(shape.Contains(rect.TopLeft));
+        Assert.False(shape.Contains(rect.BottomRight));
+        Assert.False(shape.Contains(rect.TopRight));
+        Assert.False(shape.Contains(rect.BottomLeft));
+        Assert.False(shape.Contains(rect));
+    }
+    
+    [Fact]
     public void Irregular_shape_does_not_contain_overflowing_rectangle()
     {
         var shape = BuildIrregularTestShape();

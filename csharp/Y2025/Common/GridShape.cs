@@ -54,6 +54,12 @@ public sealed class GridShape
         if (!BoundingBox.Contains(rectangle))
             return false;
 
+        if (!Contains(rectangle.TopLeft) &&
+            !Contains(rectangle.TopRight) &&
+            !Contains(rectangle.BottomLeft) &&
+            !Contains(rectangle.BottomRight))
+            return false;
+        
         foreach (var ic in EnumerateCorners())
         {
             if (!rectangle.Contains(ic))
@@ -186,7 +192,7 @@ public sealed class GridShape
             
             if (c1.Row != c2.Row && c1.Col != c2.Col)
                 throw new ArgumentException($"Cannot create straight line between {c1} and {c2}. Corners must be adjacent.");
-            
+
             edges.Add(GridLine.CreateStraight(c1, c2));
         }
         
