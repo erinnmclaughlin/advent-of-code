@@ -1,10 +1,9 @@
 using System.Text;
 using AdventOfCode.Y2025;
-using AdventOfCode.Y2025.Common;
 
 namespace AdventOfCode.Tests.Y2025;
 
-public sealed class Day09Tests(ITestOutputHelper output)
+public sealed class Day09Tests
 {
     private readonly Day09 _solver = new();
 
@@ -45,30 +44,5 @@ public sealed class Day09Tests(ITestOutputHelper output)
 
         var value = sb.ToString().TrimEnd();
         Assert.Equal(Sample, value);
-    }
-
-    [Fact]
-    public void Test_print_grid_shape()
-    {
-        var grid = new GridShape(Day09.ParseInput(Sample).ToList());
-        output.WriteLine(grid.ToString());
-    }
-
-    [Fact]
-    public void Test_print_grid_shape_with_rectangle()
-    {
-        var cornerPoints = Day09.ParseInput(Sample).ToList();
-        var shape = new GridShape(cornerPoints);
-        
-        var rectangles = cornerPoints.SelectMany(c1 => cornerPoints.Where(c2 => c1 != c2).Select(c2 => Day09.BuildRectangle(c1, c2)));
-        
-        output.WriteLine(shape.ToString());
-        output.WriteLine("");
-        
-        foreach (var rect in rectangles.Where(r => r.GetArea() == 40))
-        {
-            output.WriteLine(shape.ToString(rect));
-            output.WriteLine("");
-        }
     }
 }
