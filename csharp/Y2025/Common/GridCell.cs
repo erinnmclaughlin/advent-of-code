@@ -9,4 +9,6 @@ public sealed record GridCell(int Col, int Row) : AdventCell(Row, Col)
         var parts = input.Split(',');
         return new GridCell(int.Parse(parts[0]), int.Parse(parts[1]));
     }
+    
+    public override string ToString() => $"{Col},{Row}";
 }

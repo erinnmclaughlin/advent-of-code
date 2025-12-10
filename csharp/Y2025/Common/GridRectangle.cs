@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode.Y2025.Common;
 
-public sealed record GridRectangle
+public sealed class GridRectangle
 {
     public int Top => TopLeft.Row;
     public int Right => TopRight.Col;
@@ -15,11 +15,6 @@ public sealed record GridRectangle
     public GridCell BottomLeft { get; }
     public GridCell BottomRight { get; }
 
-    public GridLine TopRow => GridLine.CreateHorizontal(TopLeft, TopRight);
-    public GridLine BottomRow => GridLine.CreateHorizontal(BottomLeft, BottomRight);
-    public GridLine LeftCol => GridLine.CreateVertical(TopLeft, BottomLeft);
-    public GridLine RightCol => GridLine.CreateVertical(TopRight, BottomRight);
-        
     public GridRectangle(GridCell topLeft, GridCell bottomRight)
     {
         if (topLeft.Row > bottomRight.Row || topLeft.Col > bottomRight.Col)
@@ -41,8 +36,13 @@ public sealed record GridRectangle
         return cell.Row >= Top && cell.Row <= Bottom && cell.Col >= Left && cell.Col <= Right;
     }
 
-    public bool Contains(GridLine row)
+    public bool Contains(GridRectangle other)
     {
-        return Contains(row.Start) && Contains(row.End);
+        return other.Top >= Top && other.Bottom <= Bottom && other.Left >= Left && other.Right <= Right;
+    }
+
+    public bool IsOnEdge(GridCell cell)
+    {
+        return Contains(cell) && cell.Row == Top || cell.Row == Bottom || cell.Col == Left || cell.Col == Right;
     }
 }
