@@ -1,20 +1,20 @@
-using System.Collections.Immutable;
-using System.Text;
-
 namespace AdventOfCode.Y2025;
 
 public sealed class Day10() : AdventDay(2025, 10)
 {
     public override AdventDaySolution Solve(string input)
     {
+        var sum = 0L;
+        
         foreach (var line in InputHelper.GetLines(input))
         {
-            
+            var sc = StateContainer.Parse(line);
+            sum += sc.CountFewestSteps();
         }
 
         // TODO: implement puzzle logic here
 
-        return ("", "");
+        return (sum, "");
     }
     
     public sealed class StateContainer
@@ -34,11 +34,56 @@ public sealed class Day10() : AdventDay(2025, 10)
         {
             var initialLightState = Enumerable.Repeat(false, Target.Length);
             var initialPressedState = Buttons.ToDictionary(b => b, _ => 0);
-            
-            return Buttons.Min(b => CountFewestSteps(initialLightState.ToArray(), b, initialPressedState.ToDictionary()));
+
+            var lowesetKnown = CountStepsToAnySolution();
+            return Buttons.Min(b => CountFewestSteps(initialLightState.ToArray(), b, initialPressedState.ToDictionary(), lowesetKnown));
         }
         
-        public int CountFewestSteps(bool[] state, int[] button, Dictionary<int[], int> pressed)
+        public int CountFewestSteps(bool[] state, int[] button, Dictionary<int[], int> pressed, int lowestKnown)
+        {
+            var currentCost = pressed.Sum(b => b.Value);
+
+            if (currentCost > lowestKnown)
+                return int.MaxValue;
+
+            if (state.SequenceEqual(Target))
+                return currentCost;
+
+            foreach (var i in button)
+                state[i] = !state[i];
+
+            pressed[button]++;
+
+            var buttons = Buttons.Where(b => b != button && pressed[b] < 2).ToArray();
+
+            foreach (var b in buttons)
+            {
+                var cost = CountFewestSteps([..state], b, pressed.ToDictionary(), lowestKnown);
+                
+                if (cost < lowestKnown)
+                    lowestKnown = cost;
+            }
+
+            return lowestKnown;
+        }
+
+        public int CountStepsToAnySolution()
+        {
+            var state = Enumerable.Repeat(false, Target.Length).ToArray();
+            var pressed = Buttons.ToDictionary(b => b, _ => 0);
+            
+            foreach (var b in Buttons)
+            {
+                var cost = CountStepsToAnySolution([..state], b, pressed.ToDictionary());
+
+                if (cost < int.MaxValue)
+                    return cost;
+            }
+
+            return int.MaxValue;
+        }
+        
+        public int CountStepsToAnySolution(bool[] state, int[] button, Dictionary<int[], int> pressed)
         {
             if (state.SequenceEqual(Target))
                 return pressed.Sum(b => b.Value);
@@ -48,17 +93,15 @@ public sealed class Day10() : AdventDay(2025, 10)
 
             pressed[button]++;
 
-            var buttons = Buttons.Where(b => b != button && pressed[b] < 2).ToArray();
-
-            if (buttons.Length == 0)
+            foreach (var b in Buttons.Where(b => b != button && pressed[b] < 2))
             {
-                return int.MaxValue;
+                var cost = CountStepsToAnySolution([..state], b, pressed.ToDictionary());
+
+                if (cost < int.MaxValue)
+                    return cost;
             }
             
-            //if (buttons.Length == 1)
-            //    return CountFewestSteps(state, buttons[0], pressed);
-
-            return buttons.Min(b => CountFewestSteps([..state], b, pressed.ToDictionary()));
+            return int.MaxValue;
         }
         
         public static StateContainer Parse(string input)

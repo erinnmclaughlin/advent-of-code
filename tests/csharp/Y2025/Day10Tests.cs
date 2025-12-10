@@ -16,8 +16,7 @@ public sealed class Day10Tests
     public void Sample_matches_part_one_problem_statement()
     {
         var (p1, _) = _solver.Solve(Sample);
-        Assert.Skip("Not implemented");
-        Assert.Equal("", p1);
+        Assert.Equal("7", p1);
     }
 
     [Fact]
