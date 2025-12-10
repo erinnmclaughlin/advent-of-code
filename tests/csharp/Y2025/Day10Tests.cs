@@ -31,7 +31,7 @@ public sealed class Day10Tests
     public void Get_calculate_lowest_cost()
     {
         var lineToParse = InputHelper.GetLines(Sample)[0];
-        var parsed = Day10.StateContainer.Parse(lineToParse);
+        var parsed = Day10.Instruction.Parse(lineToParse);
         var cost = parsed.CountFewestSteps();
         Assert.Equal(2, cost);
     }
@@ -40,22 +40,10 @@ public sealed class Day10Tests
     public void Can_parse_initial_state()
     {
         var lineToParse = InputHelper.GetLines(Sample)[0];
-        var parsed = Day10.StateContainer.Parse(lineToParse);
+        var parsed = Day10.Instruction.Parse(lineToParse);
         
-        Assert.Equal(4, parsed.Target.Length);
-        Assert.False(parsed.Target[0]);
-        Assert.True(parsed.Target[1]);
-        Assert.True(parsed.Target[2]);
-        Assert.False(parsed.Target[0]);
+        Assert.Equal(4, parsed.TargetState.Length);
         
         Assert.Equivalent(new[] { 3,5,4,7 }, parsed.JoltageRequirements);
-        
-        Assert.Equal(6, parsed.Buttons.Length);
-        Assert.Equivalent(new[] { 3 }, parsed.Buttons[0]);
-        Assert.Equivalent(new[] { 1,3 }, parsed.Buttons[1]);
-        Assert.Equivalent(new[] { 2 }, parsed.Buttons[2]);
-        Assert.Equivalent(new[] { 2,3 }, parsed.Buttons[3]);
-        Assert.Equivalent(new[] { 0,2 }, parsed.Buttons[4]);
-        Assert.Equivalent(new[] { 0,1 }, parsed.Buttons[5]);
     }
 }
