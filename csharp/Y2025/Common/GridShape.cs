@@ -5,12 +5,13 @@ namespace AdventOfCode.Y2025.Common;
 public sealed class GridShape
 {
     private readonly List<GridLine> _edges;
+    private readonly List<GridCell> _innerCorners = [];
+    private readonly List<GridCell> _outerCorners = [];
 
     public GridRectangle BoundingBox { get; }
     
     public int EdgeCount => _edges.Count;
     
-
     public GridShape(List<GridCell> corners) : this(GetEdgesFromCorners(corners))
     {
     }
@@ -29,6 +30,23 @@ public sealed class GridShape
             new GridCell(minCol, minRow),
             new GridCell(maxCol, maxRow)
         );
+
+        foreach (var edge in _edges)
+        {
+            var cell = edge.Start;
+
+            if (Contains(new GridCell(cell.Col, cell.Row - 1)) &&
+                Contains(new GridCell(cell.Col, cell.Row + 1)) &&
+                Contains(new GridCell(cell.Col - 1, cell.Row)) &&
+                Contains(new GridCell(cell.Col + 1, cell.Row)))
+            {
+                _innerCorners.Add(cell);
+            }
+            else
+            {
+                _outerCorners.Add(cell);
+            }
+        }
     }
 
     public bool Contains(GridRectangle rectangle)
@@ -36,21 +54,29 @@ public sealed class GridShape
         if (!BoundingBox.Contains(rectangle))
             return false;
 
-        foreach (var corner in EnumerateCorners())
+        foreach (var ic in EnumerateCorners())
         {
-            if (rectangle.Contains(corner) && !rectangle.IsOnEdge(corner))
+            if (!rectangle.Contains(ic))
+                continue;
+            
+            if (!rectangle.IsOnEdge(ic))
                 return false;
+
+            // todo: really only need to check diagonals but i'm being extra
+            for (var rowOffset = -1; rowOffset <= 1; rowOffset++)
+            {
+                for (var colOffset = -1; colOffset <= 1; colOffset++)
+                {
+                    if (rowOffset == 0 && colOffset == 0) continue;
+                        
+                    var cell = new GridCell(ic.Col + colOffset, ic.Row + rowOffset);
+                    if (rectangle.Contains(cell) && !Contains(cell))
+                        return false;
+                }
+            }
+
         }
         
-        // TODO: check intersections instead of doing this
-        var edgeCells = rectangle.TopEdge.EnumerateCells()
-            .Concat(rectangle.RightEdge.EnumerateCells())
-            .Concat(rectangle.BottomEdge.EnumerateCells())
-            .Concat(rectangle.LeftEdge.EnumerateCells());
-
-        if (edgeCells.AsParallel().Any(c => !Contains(c)))
-            return false;
-
         return true;
     }
 
@@ -177,9 +203,13 @@ public sealed class GridShape
             {
                 var cell = new GridCell(col, row);
 
-                if (IsOnCorner(cell))
+                if (_innerCorners.Contains(cell))
                 {
-                    sb.Append('#');
+                    sb.Append('I');
+                }
+                else if (_outerCorners.Contains(cell))
+                {
+                    sb.Append('O');
                 }
                 else if (IsOnEdge(cell))
                 {
@@ -211,13 +241,17 @@ public sealed class GridShape
             {
                 var cell = new GridCell(col, row);
 
-                if (rect.Contains(cell))
+                if (_innerCorners.Contains(cell))
+                {
+                    sb.Append('I');
+                }
+                else if (_outerCorners.Contains(cell))
+                {
+                    sb.Append('O');
+                }
+                else if (rect.Contains(cell))
                 {
                     sb.Append('R');
-                }
-                else if (IsOnCorner(cell))
-                {
-                    sb.Append('#');
                 }
                 else if (IsOnEdge(cell))
                 {
