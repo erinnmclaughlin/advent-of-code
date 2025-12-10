@@ -4,57 +4,8 @@ namespace AdventOfCode.Y2025;
 
 public sealed class Day10() : AdventDay(2025, 10)
 {
-    public override AdventDaySolution Solve(string input)
-    {
-        var sum = ParseInput(input).Sum(i => i.CountFewestSteps());
-        return (sum, "");
-    }
-    
-    public static Instruction[] ParseInput(string input) => InputHelper
-        .GetLines(input)
-        .Select(Instruction.Parse)
-        .ToArray();
-
-    public sealed class Machine
-    {
-        public string IndicatorLights { get; private set; }
-        public int[] Joltages { get; private init; }
-
-        public Machine(Instruction instruction) : this(instruction.TargetState.Length)
-        {
-        }
-        
-        public Machine(int size)
-        {
-            IndicatorLights = new string('.', size);
-            Joltages = new int[size];
-        }
-        
-        public void PressButton(int[] button)
-        {
-            var sb = new StringBuilder();
-
-            for (var i = 0; i < IndicatorLights.Length; i++)
-            {
-                if (button.Contains(i))
-                {
-                    sb.Append(IndicatorLights[i] == '.' ? '#' : '.');
-                    Joltages[i]++;
-                }
-                else
-                {
-                    sb.Append(IndicatorLights[i]);
-                }
-                
-            }
-
-            IndicatorLights = sb.ToString();
-        }
-    }
-    
     public sealed class Instruction
     {
-        public string EmptyState => new('.', TargetState.Length);
         public string TargetState { get; }
         
         public Dictionary<string, int[]> Buttons { get; }
@@ -76,57 +27,57 @@ public sealed class Day10() : AdventDay(2025, 10)
             
             return new Instruction(buttons, targetState, joltageRequirements);
         }
-        
-        public int CountFewestSteps()
-        {
-            if (TargetState == EmptyState) 
-                return 0;
+    }
+    
+    public override AdventDaySolution Solve(string input)
+    {
+        var sum = ParseInput(input).Sum(CountFewestStepsForIndicatorLight);
+        return (sum, "");
+    }
+    
+    public static Instruction[] ParseInput(string input) => InputHelper
+        .GetLines(input)
+        .Select(Instruction.Parse)
+        .ToArray();
 
-            var queue = CreateInitialQueue();
+    
+    public static int CountFewestStepsForIndicatorLight(Instruction instruction)
+    {
+        var emptyState = new string('.', instruction.TargetState.Length);
             
-            while (queue.TryDequeue(out var next))
-            {
-                var (button, state, steps) = next;
-                
-                state = GetNextState(state, button);
-                steps++;
-                
-                if (state == TargetState) 
-                    return steps;
-                
-                foreach (var b in Buttons.Keys.Where(b => button != b))
-                    queue.Enqueue((b, state, steps));
-            }
-            
-            // puzzle input should always be valid
-            throw new InvalidOperationException("No solution found");
-        }
-
-        private Queue<(string Button, string State, int Steps)> CreateInitialQueue()
-        {
-            var queue = new Queue<(string Button, string State, int Steps)>();
-
-            foreach (var button in Buttons.Keys)
-            {
-                queue.Enqueue((button, EmptyState, 0));
-            }
-
-            return queue;
-        }
+        if (instruction.TargetState == emptyState) return 0;
         
-        private string GetNextState(string current, string button)
+        var queue = CreateQueue(instruction.Buttons.Keys.Select(b => (NextButton: b, State: emptyState, StepCount: 1)));
+            
+        while (queue.TryDequeue(out var current))
         {
-            var sb = new StringBuilder();
+            var nextState = GetNextIndicatorLight(current.State, instruction.Buttons[current.NextButton]);
 
-            for (var i = 0; i < current.Length; i++)
-            {
-                if (Buttons[button].Contains(i))
-                    sb.Append(current[i] == '.' ? '#' : '.');
-                else
-                    sb.Append(current[i]);
-            }
-
-            return sb.ToString();
+            if (nextState == instruction.TargetState)
+                return current.StepCount;
+                
+            foreach (var b in instruction.Buttons.Keys.Where(b => b != current.NextButton))
+                queue.Enqueue((b, nextState, current.StepCount + 1));
         }
+            
+        // puzzle input should always be valid
+        throw new InvalidOperationException("No solution found");
+    }
+    
+    private static Queue<T> CreateQueue<T>(IEnumerable<T> items) => new(items);
+    
+    private static string GetNextIndicatorLight(string current, int[] button)
+    {
+        var sb = new StringBuilder();
+
+        for (var i = 0; i < current.Length; i++)
+        {
+            if (button.Contains(i))
+                sb.Append(current[i] == '.' ? '#' : '.');
+            else
+                sb.Append(current[i]);
+        }
+
+        return sb.ToString();
     }
 }

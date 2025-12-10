@@ -30,9 +30,8 @@ public sealed class Day10Tests
     [Fact]
     public void Get_calculate_lowest_cost()
     {
-        var lineToParse = InputHelper.GetLines(Sample)[0];
-        var parsed = Day10.Instruction.Parse(lineToParse);
-        var cost = parsed.CountFewestSteps();
+        var instruction = Day10.ParseInput(Sample)[0];
+        var cost = Day10.CountFewestStepsForIndicatorLight(instruction);
         Assert.Equal(2, cost);
     }
 
@@ -47,29 +46,5 @@ public sealed class Day10Tests
         Assert.Equal(6, instruction.Buttons.Count);
         Assert.Equal(new [] { 3 }, instruction.Buttons["3"]);
         Assert.Equal(new [] { 1, 3 }, instruction.Buttons["1,3"]);
-    }
-
-    [Fact]
-    public void Can_create_machine()
-    {
-        var instruction = Day10.ParseInput(Sample)[0];
-        var machine = new Day10.Machine(instruction);
-        Assert.Equal("....", machine.IndicatorLights);
-        Assert.Equivalent(new[] { 0,0,0,0 }, machine.Joltages);
-    }
-
-    [Fact]
-    public void Can_press_button_on_machine()
-    {
-        var instruction = Day10.ParseInput(Sample)[0];
-        var machine = new Day10.Machine(instruction);
-        
-        machine.PressButton([0, 2]);
-        Assert.Equal("#.#.", machine.IndicatorLights);
-        Assert.Equivalent(new[] { 1, 0, 1, 0 }, machine.Joltages);
-        
-        machine.PressButton([0, 2]);
-        Assert.Equal("....", machine.IndicatorLights);
-        Assert.Equivalent(new[] { 2, 0, 2, 0 }, machine.Joltages);
     }
 }
