@@ -59,6 +59,32 @@ public sealed class GridShape
             !Contains(rectangle.BottomLeft) ||
             !Contains(rectangle.BottomRight))
             return false;
+
+        foreach (var edge in _edges)
+        {
+            if (edge.IsHorizontal)
+            {
+                var c1 = new GridCell(edge.Start.Col, edge.Start.Row - 1);
+                if (rectangle.Contains(c1) && !Contains(c1)) return false;
+                var c2 = new GridCell(edge.Start.Col, edge.Start.Row + 1);
+                if (rectangle.Contains(c2) && !Contains(c2)) return false;
+                var c3 = new  GridCell(edge.End.Col, edge.Start.Row - 1);
+                if (rectangle.Contains(c3) && !Contains(c3)) return false;
+                var c4 = new  GridCell(edge.End.Col, edge.Start.Row + 1);
+                if (rectangle.Contains(c4) && !Contains(c4)) return false;
+            }
+            else
+            {
+                var c1 = new GridCell(edge.Start.Col - 1, edge.Start.Row);
+                if (rectangle.Contains(c1) && !Contains(c1)) return false;
+                var c2 = new GridCell(edge.Start.Col + 1, edge.Start.Row);
+                if (rectangle.Contains(c2) && !Contains(c2)) return false;
+                var c3 = new  GridCell(edge.Start.Col - 1, edge.End.Row);
+                if (rectangle.Contains(c3) && !Contains(c3)) return false;
+                var c4 = new  GridCell(edge.Start.Col + 1, edge.End.Row);
+                if (rectangle.Contains(c4) && !Contains(c4)) return false;
+            }
+        }
         
         foreach (var ic in EnumerateCorners())
         {

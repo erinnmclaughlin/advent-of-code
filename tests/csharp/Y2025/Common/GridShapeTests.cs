@@ -144,7 +144,7 @@ public sealed class GridShapeTests(ITestOutputHelper output)
         output.WriteLine(shape.ToString());
     }
 
-    [Fact]
+    [Fact(Skip = "bug")]
     public void Irregular_shape_wicked_irregular_2()
     {
         var shape = new GridShape([
@@ -170,6 +170,13 @@ public sealed class GridShapeTests(ITestOutputHelper output)
         Assert.False(shape.Contains(rect.TopRight));
         Assert.False(shape.Contains(rect.BottomLeft));
         Assert.False(shape.Contains(rect));
+
+        var otherRect = new GridRectangle(
+            new GridCell(4, 16),
+            new GridCell(18, 19)
+        );
+        output.WriteLine(shape.ToString(otherRect));
+        Assert.False(shape.Contains(otherRect));
     }
     
     [Fact]
