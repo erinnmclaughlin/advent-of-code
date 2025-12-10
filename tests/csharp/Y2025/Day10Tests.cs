@@ -42,8 +42,11 @@ public sealed class Day10Tests
         var lineToParse = InputHelper.GetLines(Sample)[0];
         var parsed = Day10.Instruction.Parse(lineToParse);
         
-        Assert.Equal(4, parsed.TargetState.Length);
-        
+        Assert.Equal(".##.", parsed.TargetState);
         Assert.Equivalent(new[] { 3,5,4,7 }, parsed.JoltageRequirements);
+
+        Assert.Equal(6, parsed.Buttons.Count);
+        Assert.Equal(new [] { 3 }, parsed.Buttons["3"]);
+        Assert.Equal(new [] { 1, 3 }, parsed.Buttons["1,3"]);
     }
 }

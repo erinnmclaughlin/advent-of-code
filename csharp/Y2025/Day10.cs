@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace AdventOfCode.Y2025;
 
 public sealed class Day10() : AdventDay(2025, 10)
@@ -12,82 +14,82 @@ public sealed class Day10() : AdventDay(2025, 10)
         .GetLines(input)
         .Select(Instruction.Parse)
         .ToArray();
-    
+
     public sealed class Instruction
     {
+        public string EmptyState => new('.', TargetState.Length);
         public string TargetState { get; }
-        public string[] Buttons { get; }
+        
+        public Dictionary<string, int[]> Buttons { get; }
         public int[] JoltageRequirements { get; }
 
-        public Instruction(string[] buttons, string targetState, int[] joltageRequirements)
+        private Instruction(string[] buttons, string targetState, int[] joltageRequirements)
         {
-            Buttons = buttons;
+            Buttons = buttons.ToDictionary(b => b, b => b.Split(',').Select(int.Parse).ToArray());
             TargetState = targetState;
             JoltageRequirements = joltageRequirements;
         }
-
-        public int CountFewestSteps()
-        {
-            var initialLightState = new string('.', TargetState.Length);
-            var initialPressedState = Buttons.ToDictionary(b => b, _ => 0);
-
-            var lowestKnown = int.MaxValue;
-            return Buttons.Min(b => CountFewestSteps(initialLightState, b, initialPressedState.ToDictionary(), ref lowestKnown));
-        }
         
-        public int CountFewestSteps(string state, string button, Dictionary<string, int> pressed, ref int lowestKnown)
-        {
-            var currentCost = pressed.Sum(b => b.Value);
-
-            if (currentCost > lowestKnown)
-                return int.MaxValue;
-
-            if (state.Equals(TargetState))
-                return currentCost;
-
-            var nextState = new Span<char>(state.ToCharArray());
-
-            foreach (var i in button.Split(',').Select(int.Parse))
-                nextState[i] = nextState[i] == '.' ? '#' : '.';
-
-            pressed[button]++;
-
-            var buttons = Buttons.Where(b => b != button && pressed[b] < 2).ToArray();
-
-            foreach (var b in buttons)
-            {
-                var cost = CountFewestSteps(nextState.ToString(), b, pressed.ToDictionary(), ref lowestKnown);
-                
-                if (cost < lowestKnown)
-                    lowestKnown = cost;
-            }
-
-            return lowestKnown;
-        }
-
         public static Instruction Parse(string input)
         {
             var parts = input.Split(' ');
-            var targetState = ParseTargetState(parts[0]);
-            var joltageRequirements = ParseJoltageRequirement(parts[^1]);
-            var buttons = parts[1..^1].Select(ParseButton).ToArray();
+            var targetState = parts[0][1..^1];
+            var joltageRequirements = parts[^1][1..^1].Split(',').Select(int.Parse).ToArray();
+            var buttons = parts[1..^1].Select(b => b[1..^1]).ToArray();
             
             return new Instruction(buttons, targetState, joltageRequirements);
         }
-
-        private static string ParseTargetState(string targetStatePart)
+        
+        public int CountFewestSteps()
         {
-            return targetStatePart[1..^1];
+            if (TargetState == EmptyState) 
+                return 0;
+
+            var queue = CreateInitialQueue();
+            
+            while (queue.TryDequeue(out var next))
+            {
+                var (button, state, steps) = next;
+                
+                state = GetNextState(state, button);
+                steps++;
+                
+                if (state == TargetState) 
+                    return steps;
+                
+                foreach (var b in Buttons.Keys.Where(b => button != b))
+                    queue.Enqueue((b, state, steps));
+            }
+            
+            // puzzle input should always be valid
+            throw new InvalidOperationException("No solution found");
         }
 
-        private static int[] ParseJoltageRequirement(string joltageRequirementPart)
+        private Queue<(string Button, string State, int Steps)> CreateInitialQueue()
         {
-            return joltageRequirementPart[1..^1].Split(',').Select(int.Parse).ToArray();
-        }
+            var queue = new Queue<(string Button, string State, int Steps)>();
 
-        private static string ParseButton(string buttonPart)
+            foreach (var button in Buttons.Keys)
+            {
+                queue.Enqueue((button, EmptyState, 0));
+            }
+
+            return queue;
+        }
+        
+        private string GetNextState(string current, string button)
         {
-            return buttonPart[1..^1];
+            var sb = new StringBuilder();
+
+            for (var i = 0; i < current.Length; i++)
+            {
+                if (Buttons[button].Contains(i))
+                    sb.Append(current[i] == '.' ? '#' : '.');
+                else
+                    sb.Append(current[i]);
+            }
+
+            return sb.ToString();
         }
     }
 }
