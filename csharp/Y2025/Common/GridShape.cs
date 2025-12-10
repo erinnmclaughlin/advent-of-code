@@ -229,19 +229,19 @@ public sealed class GridShape
     {
         var sb = new StringBuilder();
         
-        for (var row = BoundingBox.Top; row <= BoundingBox.Bottom; row++)
+        for (var row = 0; row <= BoundingBox.Bottom; row++)
         {
-            for (var col = BoundingBox.Left; col <= BoundingBox.Right; col++)
+            for (var col = 0; col <= BoundingBox.Right; col++)
             {
                 var cell = new GridCell(col, row);
 
                 if (_innerCorners.Contains(cell))
                 {
-                    sb.Append('I');
+                    sb.Append('X');
                 }
                 else if (_outerCorners.Contains(cell))
                 {
-                    sb.Append('O');
+                    sb.Append('X');
                 }
                 else if (IsOnEdge(cell))
                 {
@@ -249,7 +249,7 @@ public sealed class GridShape
                 }
                 else if (Contains(new GridCell(col, row)))
                 {
-                    sb.Append('C');
+                    sb.Append('X');
                 }
                 else
                 {

@@ -2,31 +2,28 @@ using AdventOfCode.Y2025.Common;
 
 namespace AdventOfCode.Y2025;
 
-// 4634026886 is too high
 public sealed class Day09() : AdventDay(2025, 9)
 {
     public override AdventDaySolution Solve(string input)
     {
-        var cornerPoints = ParseInput(input).ToList();
-        var shape = new GridShape(cornerPoints);
-        
-        var rectangles = cornerPoints.SelectMany(c1 => cornerPoints.Where(c2 => c1 != c2).Select(c2 => BuildRectangle(c1, c2)));
-        
-        var maxArea = 0L;
-        var maxBoundedArea = 0L;
+        var points = ParseInput(input).ToArray();
+        var boundaries = EnumerateBoundaries(points).ToArray();
 
-        foreach (var rectangle in rectangles)
+        long? max = null;
+        long? boundedMax = null;
+
+        foreach (var rectangle in EnumerateOrderedRectangles(points))
         {
-            var area = rectangle.GetArea();
+            max ??= rectangle.GetArea();
 
-            if (area > maxArea) 
-                maxArea = area;
-            
-            if (area > maxBoundedArea && shape.Contains(rectangle))
-                maxBoundedArea = area;
+            if (boundaries.All(s => !s.IsCollidingWith(rectangle)))
+            {
+                boundedMax = rectangle.GetArea();
+                return (max, boundedMax);
+            }
         }
-        
-        return (maxArea, maxBoundedArea);
+
+        return (max, boundedMax);
     }
     
     public static GridRectangle BuildRectangle(GridCell cell1, GridCell cell2)
@@ -40,4 +37,12 @@ public sealed class Day09() : AdventDay(2025, 9)
     {
         return InputHelper.GetLines(input).Select(GridCell.Parse);
     }
+    
+    public static IOrderedEnumerable<GridRectangle> EnumerateOrderedRectangles(GridCell[] cells) => cells
+        .SelectMany(c1 => cells.Select(c2 => BuildRectangle(c1, c2)))
+        .OrderByDescending(r => r.GetArea());
+
+    public static IEnumerable<GridRectangle> EnumerateBoundaries(GridCell[] corners) => corners
+        .Zip(corners.Prepend(corners.Last()))
+        .Select(p => BuildRectangle(p.First, p.Second));
 }

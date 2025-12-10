@@ -15,11 +15,6 @@ public sealed class GridRectangle
     public GridCell BottomLeft { get; }
     public GridCell BottomRight { get; }
 
-    public GridLine TopEdge => GridLine.CreateHorizontal(TopLeft, TopRight);
-    public GridLine RightEdge => GridLine.CreateVertical(TopRight, BottomRight);
-    public GridLine BottomEdge => GridLine.CreateHorizontal(BottomRight, BottomLeft);
-    public GridLine LeftEdge => GridLine.CreateVertical(BottomLeft, TopLeft);
-    
     public GridRectangle(GridCell topLeft, GridCell bottomRight)
     {
         if (topLeft.Row > bottomRight.Row || topLeft.Col > bottomRight.Col)
@@ -46,6 +41,16 @@ public sealed class GridRectangle
         return other.Top >= Top && other.Bottom <= Bottom && other.Left >= Left && other.Right <= Right;
     }
 
+    // https://kishimotostudios.com/articles/aabb_collision/
+    public bool IsCollidingWith(GridRectangle other)
+    {
+        var aIsToTheLeft = Right <= other.Left;
+        var aIsToTheRight = Left >= other.Right;
+        var aIsAbove = Bottom <= other.Top;
+        var aIsBelow = Top >= other.Bottom;
+        return !(aIsToTheRight || aIsToTheLeft || aIsAbove || aIsBelow);
+    }
+    
     public bool IsOnEdge(GridCell cell)
     {
         return Contains(cell) && cell.Row == Top || cell.Row == Bottom || cell.Col == Left || cell.Col == Right;
