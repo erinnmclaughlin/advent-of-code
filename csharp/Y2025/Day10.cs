@@ -74,7 +74,43 @@ public sealed class Day10() : AdventDay(2025, 10)
 
     public static int CountFewestStepsForJoltageMeter(Instruction instruction)
     {
+        var stateLookup = new List<int[]> { new int[instruction.JoltageRequirements.Length] };
+        var queue = CreateQueue(instruction.Buttons.Keys.Select(b => (NextButton: b, StateId: 0, StepCount: 1)));
+        
+        while (queue.TryDequeue(out var current))
+        {
+            if (!TryGetNextJoltageMeter(
+                    instruction.Buttons[current.NextButton],
+                    stateLookup[current.StateId],
+                    instruction.JoltageRequirements,
+                    out var nextMeter))
+                continue;
+            
+            if (nextMeter.SequenceEqual(instruction.JoltageRequirements))
+                return current.StepCount;
+            
+            stateLookup.Add(nextMeter);
+            
+            foreach (var b in instruction.Buttons.Keys)
+                queue.Enqueue((b, stateLookup.Count - 1, current.StepCount + 1));
+        }
+        
         return 0;
+    }
+
+    private static bool TryGetNextJoltageMeter(int[] button, int[] current, int[] required, out int[] next)
+    {
+        next = new int[current.Length];
+
+        for (var i = 0; i < current.Length; i++)
+        {
+            next[i] = current[i] + (button.Contains(i) ? 1 : 0);
+
+            if (next[i] > required[i])
+                return false;
+        }
+
+        return true;
     }
     
     private static Queue<T> CreateQueue<T>(IEnumerable<T> items) => new(items);
