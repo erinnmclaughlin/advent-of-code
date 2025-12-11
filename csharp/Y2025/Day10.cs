@@ -90,16 +90,6 @@ public sealed class Day10() : AdventDay(2025, 10)
         return sb.ToString();
     }
 
-    public sealed class State : IDisposable
-    {
-        public int ClientCount { get; set; }
-        public int[] JoltageMeters { get; set; } = [];
-
-        public void Dispose()
-        {
-        }
-    }
-
     public static int CountFewestStepsForJoltageMeter(Instruction instruction)
     {
         var emptyState = new int[instruction.JoltageRequirements.Length];
