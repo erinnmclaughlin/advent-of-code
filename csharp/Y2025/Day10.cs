@@ -98,12 +98,13 @@ public sealed class Day10() : AdventDay(2025, 10)
 
     public static int CountFewestStepsForJoltageMeter(Instruction instruction)
     {
-        var prioritizedButtons = GetPrioritizedButtonsForTargetJoltage(instruction).Select(i => instruction.Buttons[i]).ToArray();
+        var prioritizedButtons = instruction.Buttons.Index().OrderBy(bi => GetMaxPushes(bi.Item, instruction.JoltageRequirements)).Select(x => x.Index).ToArray();
         var queue = CreateQueue(prioritizedButtons.Select(b => (NextButton: b, State: instruction.JoltageRequirements, StepCount: 1)));
         
         while (queue.TryDequeue(out var current))
         {
-            var (canGet, isComplete) = TryGetNextJoltageMeter(current.NextButton, current.State, out var nextMeter);
+            var currentButton = instruction.Buttons[current.NextButton];
+            var (canGet, isComplete) = TryGetNextJoltageMeter(currentButton, current.State, out var nextMeter);
             
             if (!canGet) continue;
             
@@ -116,21 +117,9 @@ public sealed class Day10() : AdventDay(2025, 10)
         return 0;
     }
 
-    private static int[] GetPrioritizedButtonsForTargetJoltage(Instruction instruction)
+    private static int GetMaxPushes(int[] button, int[] joltages)
     {
-        // this doesn't really seem to help anything but leaving it here for now in case i think of a better way of prioritizing
-        
-        return instruction.Buttons
-            .Index()
-            .Select(bi => new
-            {
-                Button = bi.Index,
-                MaxPushes = bi.Item.Min(i => instruction.JoltageRequirements[i])
-            })
-            .Where(x => x.MaxPushes != 0)
-            .OrderBy(x => x.MaxPushes)
-            .Select(x => x.Button)
-            .ToArray();
+        return button.Min(i => joltages[i]);
     }
     
     private static (bool CanGet, bool IsComplete) TryGetNextJoltageMeter(int[] button, int[] current, out int[] next)
