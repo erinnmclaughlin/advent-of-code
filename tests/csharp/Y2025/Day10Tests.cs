@@ -40,7 +40,7 @@ public sealed class Day10Tests
     {
         var instruction = Day10.ParseInput(Sample)[0];
         
-        Assert.Equal(".##.", instruction.TargetState);
+        Assert.Equal(".##.", instruction.TargetIndicatorLight);
         Assert.Equivalent(new[] { 3,5,4,7 }, instruction.JoltageRequirements);
 
         Assert.Equal(6, instruction.Buttons.Count);
