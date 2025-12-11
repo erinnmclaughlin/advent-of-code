@@ -11,23 +11,27 @@ public sealed class Day11() : AdventDay(2025, 11)
     public override AdventDaySolution Solve(string input)
     {
         var items = ParseInput(input);
+        
+        // "OrDefault" just to be flexible with test inputs
+        
         var start1 = items.FirstOrDefault(x => x.Label == "you");
-        var part1 = start1 is null ? 0 : CountPathsToOut(start1);
+        var part1 = start1 is null ? 0 : CountPartOne(start1);
         
         var start2 = items.FirstOrDefault(x => x.Label == "svr");
-        var part2 = start2 is null ? 0 : CountSvrPathsToOut(start2, false, false, []);
+        var part2 = start2 is null ? 0 : CountPartTwo(start2, false, false, []);
+        
         return (part1, part2);
     }
 
-    private static int CountPathsToOut(Item start)
+    private static int CountPartOne(Item item)
     {
-        if (start.Label == "out")
+        if (item.Label == "out")
             return 1;
 
-        return start.Connections.Sum(CountPathsToOut);
+        return item.Connections.Sum(CountPartOne);
     }
 
-    private static long CountSvrPathsToOut(
+    private static long CountPartTwo(
         Item item,
         bool sawDac,
         bool sawFft, 
@@ -47,7 +51,7 @@ public sealed class Day11() : AdventDay(2025, 11)
             
             if (!memory.TryGetValue(key, out var value))
             {
-                value = CountSvrPathsToOut(connection, sawDac, sawFft, memory);
+                value = CountPartTwo(connection, sawDac, sawFft, memory);
                 memory[key] = value;
             }
             
