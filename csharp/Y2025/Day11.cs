@@ -9,7 +9,7 @@ public sealed class Day11() : AdventDay(2025, 11)
         var part1 = start1 is null ? 0 : CountPathsToOut(start1);
         
         var start2 = items.FirstOrDefault(x => x.Label == "svr");
-        var part2 = start2 is null ? 0 : CountSvrPathsToOut(start2);
+        var part2 = start2 is null ? 0 : CountSvrPathsToOut(start2, false, false, []);
         return (part1, part2);
     }
 
@@ -21,7 +21,11 @@ public sealed class Day11() : AdventDay(2025, 11)
         return start.Connections.Sum(CountPathsToOut);
     }
 
-    public static int CountSvrPathsToOut(Item item, bool sawDac = false, bool sawFft = false)
+    public static long CountSvrPathsToOut(
+        Item item,
+        bool sawDac,
+        bool sawFft, 
+        Dictionary<(string Item, bool SawDac, bool SawFft), long> memory)
     {
         if (item.Label == "out")
             return sawDac && sawFft ? 1 : 0;
@@ -29,7 +33,22 @@ public sealed class Day11() : AdventDay(2025, 11)
         sawDac = sawDac || item.Label == "dac";
         sawFft = sawFft || item.Label == "fft";
 
-        return item.Connections.Sum(child => CountSvrPathsToOut(child, sawDac, sawFft));
+        var sum = 0L;
+        
+        foreach (var connection in item.Connections)
+        {
+            var key = (connection.Label, sawDac, sawFft);
+            
+            if (!memory.TryGetValue(key, out var value))
+            {
+                value = CountSvrPathsToOut(connection, sawDac, sawFft, memory);
+                memory[key] = value;
+            }
+            
+            sum += value;
+        }
+
+        return sum;
     }
     
     public static List<Item> ParseInput(string input)
@@ -37,7 +56,7 @@ public sealed class Day11() : AdventDay(2025, 11)
         var lines = InputHelper.GetLines(input);
         var items = new Dictionary<string, Item>
         {
-            ["out"] = new Item("out")
+            ["out"] = new("out")
         };
 
         foreach (var line in lines)
