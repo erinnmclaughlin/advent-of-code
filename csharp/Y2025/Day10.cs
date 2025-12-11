@@ -74,25 +74,39 @@ public sealed class Day10() : AdventDay(2025, 10)
 
     public static int CountFewestStepsForJoltageMeter(Instruction instruction)
     {
-        var stateLookup = new List<int[]> { new int[instruction.JoltageRequirements.Length] };
+        var lastId = 0;
+        var emptyState = new int[instruction.JoltageRequirements.Length];
+        var stateLookup = new Dictionary<int, int[]> { [0] = emptyState };
+        var clientLookup = new Dictionary<int, int> { [0] = instruction.Buttons.Count };
+        var reusableIds = new Stack<int>();
         var queue = CreateQueue(instruction.Buttons.Keys.Select(b => (NextButton: b, StateId: 0, StepCount: 1)));
         
         while (queue.TryDequeue(out var current))
         {
+            var state = stateLookup[current.StateId];
+            clientLookup[current.StateId]--;
+            
+            if (clientLookup[current.StateId] == 0)
+            {
+                reusableIds.Push(current.StateId);
+            }
+            
             if (!TryGetNextJoltageMeter(
                     instruction.Buttons[current.NextButton],
-                    stateLookup[current.StateId],
+                    state,
                     instruction.JoltageRequirements,
                     out var nextMeter))
                 continue;
             
             if (nextMeter.SequenceEqual(instruction.JoltageRequirements))
                 return current.StepCount;
-            
-            stateLookup.Add(nextMeter);
+
+            var nextId = reusableIds.TryPop(out var id) ? id : ++lastId;
+            clientLookup[nextId] = instruction.Buttons.Count;
+            stateLookup[nextId] = nextMeter;
             
             foreach (var b in instruction.Buttons.Keys)
-                queue.Enqueue((b, stateLookup.Count - 1, current.StepCount + 1));
+                queue.Enqueue((b, nextId, current.StepCount + 1));
         }
         
         return 0;
