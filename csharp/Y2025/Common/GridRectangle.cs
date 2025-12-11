@@ -15,17 +15,23 @@ public sealed class GridRectangle
     public GridCell BottomLeft { get; }
     public GridCell BottomRight { get; }
 
-    public GridRectangle(GridCell topLeft, GridCell bottomRight)
+    public GridRectangle(GridCell cell) : this(cell, cell)
     {
-        if (topLeft.Row > bottomRight.Row || topLeft.Col > bottomRight.Col)
-            throw new ArgumentException("Top left cell must be above and to the left of bottom right cell.");
-        
-        TopLeft = topLeft;
-        BottomRight = bottomRight;
-        TopRight = new GridCell(bottomRight.Col, topLeft.Row);
-        BottomLeft = new GridCell(topLeft.Col, bottomRight.Row);
     }
+    
+    public GridRectangle(GridCell c1, GridCell c2)
+    {
+        var top = Math.Min(c1.Row, c2.Row);
+        var bottom = Math.Max(c1.Row, c2.Row);
+        var left = Math.Min(c1.Col, c2.Col);
+        var right = Math.Max(c1.Col, c2.Col);
 
+        TopLeft = new GridCell(left, top);
+        BottomRight = new GridCell(right, bottom);
+        TopRight = new GridCell(right, top);
+        BottomLeft = new GridCell(left, bottom);
+    }
+    
     public long GetArea()
     {
         return Math.BigMul(Width, Height);
@@ -36,14 +42,15 @@ public sealed class GridRectangle
         return cell.Row >= Top && cell.Row <= Bottom && cell.Col >= Left && cell.Col <= Right;
     }
 
-    public bool Contains(GridRectangle other)
+    public bool FullyContains(GridRectangle other)
     {
         return other.Top >= Top && other.Bottom <= Bottom && other.Left >= Left && other.Right <= Right;
     }
 
-    public bool IsCollidingWith(GridRectangle other)
+    public bool OverlapsWith(GridRectangle other)
     {
-        return Right > other.Left &&
+        // if other starts before this ends, or vice versa, both vertically and horizontally, then there's no overlap
+        return Right > other.Left && 
                Left < other.Right &&
                Bottom > other.Top &&
                Top < other.Bottom;
