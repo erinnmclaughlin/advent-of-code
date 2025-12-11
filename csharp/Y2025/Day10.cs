@@ -5,16 +5,15 @@ namespace AdventOfCode.Y2025;
 
 public sealed class Day10() : AdventDay(2025, 10)
 {
-    public sealed record Instruction(string Line, Dictionary<string, int[]> Buttons, string TargetIndicatorLight, int[] JoltageRequirements)
+    public sealed record Instruction(string Line, int[][] Buttons, string TargetIndicatorLight, int[] JoltageRequirements)
     {
         public static Instruction Parse(string input)
         {
             var parts = input.Split(' ');
             var targetState = parts[0][1..^1];
             var joltageRequirements = parts[^1][1..^1].Split(',').Select(int.Parse).ToArray();
-            var buttons = parts[1..^1].Select(b => b[1..^1]);
-            var buttonLookup = buttons.ToDictionary(b => b, b => b.Split(',').Select(int.Parse).ToArray());
-            return new Instruction(input, buttonLookup, targetState, joltageRequirements);
+            var buttons = parts[1..^1].Select(b => b[1..^1].Split(',').Select(int.Parse).ToArray()).ToArray();
+            return new Instruction(input, buttons, targetState, joltageRequirements);
         }
         
         public override string ToString() => Line;
@@ -58,17 +57,24 @@ public sealed class Day10() : AdventDay(2025, 10)
     public static int CountFewestStepsForIndicatorLight(Instruction instruction)
     {
         var emptyState = new string('.', instruction.TargetIndicatorLight.Length);
-        var queue = CreateQueue(instruction.Buttons.Keys.Select(b => (NextButton: b, State: emptyState, StepCount: 1)));
+        var queue = CreateQueue(Enumerable.Range(0, instruction.Buttons.Length).Select(i => (NextButton: i, State: emptyState, StepCount: 1)));
             
         while (queue.TryDequeue(out var current))
         {
-            var nextState = GetNextIndicatorLight(current.State, instruction.Buttons[current.NextButton]);
+            var nextButton = instruction.Buttons[current.NextButton];
+            
+            var nextState = GetNextIndicatorLight(current.State, nextButton);
 
             if (nextState == instruction.TargetIndicatorLight)
                 return current.StepCount;
+
+            for (var i = 0; i < instruction.Buttons.Length; i++)
+            {
+                if (current.NextButton == i)
+                    continue;
                 
-            foreach (var b in instruction.Buttons.Keys.Where(b => b != current.NextButton))
-                queue.Enqueue((b, nextState, current.StepCount + 1));
+                queue.Enqueue((i, nextState, current.StepCount + 1));
+            }
         }
             
         // puzzle input should always be valid
@@ -93,12 +99,12 @@ public sealed class Day10() : AdventDay(2025, 10)
     public static int CountFewestStepsForJoltageMeter(Instruction instruction)
     {
         var emptyState = new int[instruction.JoltageRequirements.Length];
-        var queue = CreateQueue(instruction.Buttons.Keys.Select(b => (NextButton: b, State: emptyState, StepCount: 1)));
+        var queue = CreateQueue(instruction.Buttons.Select(b => (NextButton: b, State: emptyState, StepCount: 1)));
         
         while (queue.TryDequeue(out var current))
         {
             if (!TryGetNextJoltageMeter(
-                    instruction.Buttons[current.NextButton],
+                    current.NextButton,
                     current.State,
                     instruction.JoltageRequirements,
                     out var nextMeter))
@@ -107,7 +113,7 @@ public sealed class Day10() : AdventDay(2025, 10)
             if (nextMeter.SequenceEqual(instruction.JoltageRequirements))
                 return current.StepCount;
             
-            foreach (var b in instruction.Buttons.Keys)
+            foreach (var b in instruction.Buttons)
                 queue.Enqueue((b, nextMeter, current.StepCount + 1));
         }
         
