@@ -130,14 +130,14 @@ public sealed class Day10() : AdventDay(2025, 10)
             .Select(bi => new
             {
                 Button = bi.Index,
-                Score = instruction.JoltageRequirements.Index().Sum(jri => bi.Item.Contains(jri.Index) ? jri.Item : 0)
+                MaxPushes = bi.Item.Min(i => instruction.JoltageRequirements[i])
             })
-            .Where(x => x.Score != 0)
-            .OrderByDescending(x => x.Score)
+            .Where(x => x.MaxPushes != 0)
+            .OrderBy(x => x.MaxPushes)
             .Select(x => x.Button)
             .ToArray();
     }
-
+    
     private static bool TryGetNextJoltageMeter(int[] button, int[] current, int[] required, out int[] next)
     {
         next = new int[current.Length];
