@@ -2,6 +2,12 @@ namespace AdventOfCode.Y2025;
 
 public sealed class Day11() : AdventDay(2025, 11)
 {
+    public sealed class Item(string label)
+    {
+        public string Label { get; } = label;
+        public List<Item> Connections { get; } = [];
+    }
+    
     public override AdventDaySolution Solve(string input)
     {
         var items = ParseInput(input);
@@ -13,7 +19,7 @@ public sealed class Day11() : AdventDay(2025, 11)
         return (part1, part2);
     }
 
-    public static int CountPathsToOut(Item start)
+    private static int CountPathsToOut(Item start)
     {
         if (start.Label == "out")
             return 1;
@@ -21,7 +27,7 @@ public sealed class Day11() : AdventDay(2025, 11)
         return start.Connections.Sum(CountPathsToOut);
     }
 
-    public static long CountSvrPathsToOut(
+    private static long CountSvrPathsToOut(
         Item item,
         bool sawDac,
         bool sawFft, 
@@ -51,7 +57,7 @@ public sealed class Day11() : AdventDay(2025, 11)
         return sum;
     }
     
-    public static List<Item> ParseInput(string input)
+    private static List<Item> ParseInput(string input)
     {
         var lines = InputHelper.GetLines(input);
         var items = new Dictionary<string, Item>
@@ -59,30 +65,24 @@ public sealed class Day11() : AdventDay(2025, 11)
             ["out"] = new("out")
         };
 
-        foreach (var line in lines)
-        {
-            var label = line.Split(' ')[0].TrimEnd(':');
-            items[label] = new Item(label);
-        }
-
-        foreach (var line in lines)
+        // loop twice: once to get the items, and then again to add the connections
+        foreach (var line in lines.Concat(lines))
         {
             var parts = line.Split(' ');
             var label = parts[0].TrimEnd(':');
-            var item = items[label];
 
+            if (!items.TryGetValue(label, out var item))
+            {
+                items[label] = new Item(label);
+                continue;
+            }
+            
             foreach (var part in parts.Skip(1))
             {
                 item.Connections.Add(items[part]);
             }
         }
-        
-        return items.Values.ToList();
-    }
 
-    public sealed class Item(string label)
-    {
-        public string Label { get; } = label;
-        public List<Item> Connections { get; } = [];
+        return items.Values.ToList();
     }
 }
