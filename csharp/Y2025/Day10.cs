@@ -1,10 +1,11 @@
+using System.Diagnostics;
 using System.Text;
 
 namespace AdventOfCode.Y2025;
 
 public sealed class Day10() : AdventDay(2025, 10)
 {
-    public sealed record Instruction(Dictionary<string, int[]> Buttons, string TargetIndicatorLight, int[] JoltageRequirements)
+    public sealed record Instruction(string Line, Dictionary<string, int[]> Buttons, string TargetIndicatorLight, int[] JoltageRequirements)
     {
         public static Instruction Parse(string input)
         {
@@ -13,19 +14,36 @@ public sealed class Day10() : AdventDay(2025, 10)
             var joltageRequirements = parts[^1][1..^1].Split(',').Select(int.Parse).ToArray();
             var buttons = parts[1..^1].Select(b => b[1..^1]);
             var buttonLookup = buttons.ToDictionary(b => b, b => b.Split(',').Select(int.Parse).ToArray());
-            return new Instruction(buttonLookup, targetState, joltageRequirements);
+            return new Instruction(input, buttonLookup, targetState, joltageRequirements);
         }
+        
+        public override string ToString() => Line;
     }
     
     public override AdventDaySolution Solve(string input)
     {
         var instructions = ParseInput(input);
         var (part1, part2) = (0, 0);
-
+        
+        var stopwatch = new Stopwatch();
+        
         foreach (var instruction in instructions)
         {
-            part1 += CountFewestStepsForIndicatorLight(instruction);
-            part2 += CountFewestStepsForJoltageMeter(instruction);
+            Console.WriteLine("Solving instruction: {0}", instruction);
+            
+            stopwatch.Start();
+            var nextPart1 = CountFewestStepsForIndicatorLight(instruction);
+            part1 += nextPart1;
+            stopwatch.Stop();
+            Console.WriteLine("Part 1: {0} (Time: {1})", nextPart1, stopwatch.Elapsed);
+            stopwatch.Reset();
+            
+            stopwatch.Start();
+            var nextPart2 = CountFewestStepsForJoltageMeter(instruction);
+            part2 += nextPart2;
+            stopwatch.Stop();
+            Console.WriteLine("Part 2: {0} (Time: {1})", nextPart2, stopwatch.Elapsed);
+            stopwatch.Reset();
         }
         
         return (part1, part2);
