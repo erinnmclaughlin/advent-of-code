@@ -42,8 +42,8 @@ public sealed class Day10Tests
         Assert.Equal(".##.", instruction.TargetIndicatorLight);
         Assert.Equivalent(new[] { 3,5,4,7 }, instruction.JoltageRequirements);
 
-        Assert.Equal(6, instruction.Buttons.Count);
-        Assert.Equal(new [] { 3 }, instruction.Buttons["3"]);
-        Assert.Equal(new [] { 1, 3 }, instruction.Buttons["1,3"]);
+        Assert.Equal(6, instruction.Buttons.Length);
+        Assert.Equal(new [] { 3 }, instruction.Buttons[0]);
+        Assert.Equal(new [] { 1, 3 }, instruction.Buttons[1]);
     }
 }
