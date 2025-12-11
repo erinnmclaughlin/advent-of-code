@@ -1,10 +1,11 @@
+using System.Diagnostics;
 using System.Text;
 
 namespace AdventOfCode.Y2025;
 
 public sealed class Day10() : AdventDay(2025, 10)
 {
-    public sealed record Instruction(Dictionary<string, int[]> Buttons, string TargetIndicatorLight, int[] JoltageRequirements)
+    public sealed record Instruction(string Line, Dictionary<string, int[]> Buttons, string TargetIndicatorLight, int[] JoltageRequirements)
     {
         public static Instruction Parse(string input)
         {
@@ -13,19 +14,36 @@ public sealed class Day10() : AdventDay(2025, 10)
             var joltageRequirements = parts[^1][1..^1].Split(',').Select(int.Parse).ToArray();
             var buttons = parts[1..^1].Select(b => b[1..^1]);
             var buttonLookup = buttons.ToDictionary(b => b, b => b.Split(',').Select(int.Parse).ToArray());
-            return new Instruction(buttonLookup, targetState, joltageRequirements);
+            return new Instruction(input, buttonLookup, targetState, joltageRequirements);
         }
+        
+        public override string ToString() => Line;
     }
     
     public override AdventDaySolution Solve(string input)
     {
         var instructions = ParseInput(input);
         var (part1, part2) = (0, 0);
-
+        
+        var stopwatch = new Stopwatch();
+        
         foreach (var instruction in instructions)
         {
-            part1 += CountFewestStepsForIndicatorLight(instruction);
-            part2 += CountFewestStepsForJoltageMeter(instruction);
+            Console.WriteLine("Solving instruction: {0}", instruction);
+            
+            stopwatch.Start();
+            var nextPart1 = CountFewestStepsForIndicatorLight(instruction);
+            part1 += nextPart1;
+            stopwatch.Stop();
+            Console.WriteLine("Part 1: {0} (Time: {1})", nextPart1, stopwatch.Elapsed);
+            stopwatch.Reset();
+            
+            stopwatch.Start();
+            var nextPart2 = CountFewestStepsForJoltageMeter(instruction);
+            part2 += nextPart2;
+            stopwatch.Stop();
+            Console.WriteLine("Part 2: {0} (Time: {1})", nextPart2, stopwatch.Elapsed);
+            stopwatch.Reset();
         }
         
         return (part1, part2);
@@ -72,41 +90,35 @@ public sealed class Day10() : AdventDay(2025, 10)
         return sb.ToString();
     }
 
+    public sealed class State : IDisposable
+    {
+        public int ClientCount { get; set; }
+        public int[] JoltageMeters { get; set; } = [];
+
+        public void Dispose()
+        {
+        }
+    }
+
     public static int CountFewestStepsForJoltageMeter(Instruction instruction)
     {
-        var lastId = 0;
         var emptyState = new int[instruction.JoltageRequirements.Length];
-        var stateLookup = new Dictionary<int, int[]> { [0] = emptyState };
-        var clientLookup = new Dictionary<int, int> { [0] = instruction.Buttons.Count };
-        var reusableIds = new Stack<int>();
-        var queue = CreateQueue(instruction.Buttons.Keys.Select(b => (NextButton: b, StateId: 0, StepCount: 1)));
+        var queue = CreateQueue(instruction.Buttons.Keys.Select(b => (NextButton: b, State: emptyState, StepCount: 1)));
         
         while (queue.TryDequeue(out var current))
         {
-            var state = stateLookup[current.StateId];
-            clientLookup[current.StateId]--;
-            
-            if (clientLookup[current.StateId] == 0)
-            {
-                reusableIds.Push(current.StateId);
-            }
-            
             if (!TryGetNextJoltageMeter(
                     instruction.Buttons[current.NextButton],
-                    state,
+                    current.State,
                     instruction.JoltageRequirements,
                     out var nextMeter))
                 continue;
             
             if (nextMeter.SequenceEqual(instruction.JoltageRequirements))
                 return current.StepCount;
-
-            var nextId = reusableIds.TryPop(out var id) ? id : ++lastId;
-            clientLookup[nextId] = instruction.Buttons.Count;
-            stateLookup[nextId] = nextMeter;
             
             foreach (var b in instruction.Buttons.Keys)
-                queue.Enqueue((b, nextId, current.StepCount + 1));
+                queue.Enqueue((b, nextMeter, current.StepCount + 1));
         }
         
         return 0;
