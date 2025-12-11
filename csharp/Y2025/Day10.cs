@@ -98,21 +98,16 @@ public sealed class Day10() : AdventDay(2025, 10)
 
     public static int CountFewestStepsForJoltageMeter(Instruction instruction)
     {
-        var emptyState = new int[instruction.JoltageRequirements.Length];
         var prioritizedButtons = GetPrioritizedButtonsForTargetJoltage(instruction).Select(i => instruction.Buttons[i]).ToArray();
-        var queue = CreateQueue(prioritizedButtons.Select(b => (NextButton: b, State: emptyState, StepCount: 1)));
+        var queue = CreateQueue(prioritizedButtons.Select(b => (NextButton: b, State: instruction.JoltageRequirements, StepCount: 1)));
         
         while (queue.TryDequeue(out var current))
         {
-            if (!TryGetNextJoltageMeter(
-                    current.NextButton,
-                    current.State,
-                    instruction.JoltageRequirements,
-                    out var nextMeter))
-                continue;
+            var (canGet, isComplete) = TryGetNextJoltageMeter(current.NextButton, current.State, out var nextMeter);
             
-            if (nextMeter.SequenceEqual(instruction.JoltageRequirements))
-                return current.StepCount;
+            if (!canGet) continue;
+            
+            if (isComplete) return current.StepCount;
             
             foreach (var b in prioritizedButtons)
                 queue.Enqueue((b, nextMeter, current.StepCount + 1));
@@ -138,19 +133,23 @@ public sealed class Day10() : AdventDay(2025, 10)
             .ToArray();
     }
     
-    private static bool TryGetNextJoltageMeter(int[] button, int[] current, int[] required, out int[] next)
+    private static (bool CanGet, bool IsComplete) TryGetNextJoltageMeter(int[] button, int[] current, out int[] next)
     {
         next = new int[current.Length];
+        var isComplete = true;
 
         for (var i = 0; i < current.Length; i++)
         {
-            next[i] = current[i] + (button.Contains(i) ? 1 : 0);
+            next[i] = current[i] - (button.Contains(i) ? 1 : 0);
 
-            if (next[i] > required[i])
-                return false;
+            if (next[i] > 0)
+                isComplete = false;
+            
+            if (next[i] < 0)
+                return (false, false);
         }
 
-        return true;
+        return (true, isComplete);
     }
     
     private static Queue<T> CreateQueue<T>(IEnumerable<T> items) => new(items);
