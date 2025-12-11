@@ -1,4 +1,5 @@
 #!/usr/bin/env pwsh
+
 param(
     [Parameter(Mandatory = $true)]
     [int] $Year,
@@ -15,62 +16,24 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$dayPadded = "{0:00}" -f $Day
-$repoRoot = Resolve-Path $PSScriptRoot
+# ----------------------------
+# Repo paths
+# ----------------------------
+$dayPadded = $Day.ToString("00")
+$repoRoot = Resolve-Path (Join-Path $PSScriptRoot ".")
+$inputDir = Join-Path $repoRoot "inputs/$Year"
+$inputFile = Join-Path $inputDir "day$dayPadded.txt"
+
+# ----------------------------
+# Ensure input exists
+# ----------------------------
+if ($DownloadInput -or -not (Test-Path $inputFile)) {
+    $aocDownloader = Join-Path $PSScriptRoot "download-input.ps1"
+    & $aocDownloader -Year $Year -Day $Day
+}
 
 Write-Host "Scaffolding Year $Year Day $dayPadded..."
 Write-Host ""
-
-
-# ----------------------------
-# AoC input download helper
-# ----------------------------
-function Get-AocInput {
-    param(
-        [int] $Year,
-        [int] $Day,
-        [string] $DestinationPath
-    )
-
-    $session = $env:AOC_SESSION
-    if (-not $session) {
-        throw @"
-Advent of Code session cookie not found.
-
-Set it once with:
-  pwsh ./run.ps1 -SetSessionCookie "<your-cookie>" ...
-
-Or manually set AOC_SESSION in your environment.
-"@
-    }
-
-    $uri = "https://adventofcode.com/$Year/day/$Day/input"
-    Write-Host "Downloading input from $uri..."
-
-    if (-not (Test-Path (Split-Path $DestinationPath -Parent))) {
-        New-Item -ItemType Directory -Force `
-            -Path (Split-Path $DestinationPath -Parent) | Out-Null
-    }
-
-    $headers = @{
-        Cookie = "session=$session"
-    }
-
-    try {
-        Invoke-WebRequest `
-            -Uri $uri `
-            -Headers $headers `
-            -UseBasicParsing |
-            Select-Object -ExpandProperty Content |
-            ForEach-Object { $_.TrimEnd("`r", "`n") } |
-            Out-File -Encoding utf8 -FilePath $DestinationPath
-
-        Write-Host "Saved input to $DestinationPath"
-    }
-    catch {
-        throw "Failed to download input: $($_.Exception.Message)"
-    }
-}
 
 # ----------------------------
 # Helper: create file if missing
@@ -94,13 +57,11 @@ function New-FileIfMissing {
 }
 
 # ----------------------------
-# 1. Input file
+# Ensure input exists
 # ----------------------------
-$inputDir = Join-Path $repoRoot "inputs/$Year"
-$inputFile = Join-Path $inputDir "day$dayPadded.txt"
-
 if ($DownloadInput -or -not (Test-Path $inputFile)) {
-    Get-AocInput -Year $Year -Day $Day -DestinationPath $inputFile
+    $aocDownloader = Join-Path $PSScriptRoot "download-input.ps1"
+    & $aocDownloader -Year $Year -Day $Day
 }
 
 # ----------------------------
@@ -140,7 +101,7 @@ using AdventOfCode.Y$Year;
 
 namespace AdventOfCode.Tests.Y$Year;
 
-public class Day${dayPadded}Tests
+public sealed class Day${dayPadded}Tests
 {
     private readonly Day${dayPadded} _solver = new();
 
