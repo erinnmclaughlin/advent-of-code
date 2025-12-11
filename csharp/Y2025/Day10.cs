@@ -99,7 +99,8 @@ public sealed class Day10() : AdventDay(2025, 10)
     public static int CountFewestStepsForJoltageMeter(Instruction instruction)
     {
         var emptyState = new int[instruction.JoltageRequirements.Length];
-        var queue = CreateQueue(instruction.Buttons.Select(b => (NextButton: b, State: emptyState, StepCount: 1)));
+        var prioritizedButtons = GetPrioritizedButtonsForTargetJoltage(instruction).Select(i => instruction.Buttons[i]).ToArray();
+        var queue = CreateQueue(prioritizedButtons.Select(b => (NextButton: b, State: emptyState, StepCount: 1)));
         
         while (queue.TryDequeue(out var current))
         {
@@ -113,11 +114,28 @@ public sealed class Day10() : AdventDay(2025, 10)
             if (nextMeter.SequenceEqual(instruction.JoltageRequirements))
                 return current.StepCount;
             
-            foreach (var b in instruction.Buttons)
+            foreach (var b in prioritizedButtons)
                 queue.Enqueue((b, nextMeter, current.StepCount + 1));
         }
         
         return 0;
+    }
+
+    private static int[] GetPrioritizedButtonsForTargetJoltage(Instruction instruction)
+    {
+        // this doesn't really seem to help anything but leaving it here for now in case i think of a better way of prioritizing
+        
+        return instruction.Buttons
+            .Index()
+            .Select(bi => new
+            {
+                Button = bi.Index,
+                Score = instruction.JoltageRequirements.Index().Sum(jri => bi.Item.Contains(jri.Index) ? jri.Item : 0)
+            })
+            .Where(x => x.Score != 0)
+            .OrderByDescending(x => x.Score)
+            .Select(x => x.Button)
+            .ToArray();
     }
 
     private static bool TryGetNextJoltageMeter(int[] button, int[] current, int[] required, out int[] next)
