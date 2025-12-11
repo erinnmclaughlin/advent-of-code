@@ -16,7 +16,7 @@ public sealed class Day09() : AdventDay(2025, 9)
         {
             max ??= rectangle.GetArea();
 
-            if (shape.Contains(rectangle))
+            if (shape.FullyContains(rectangle))
             {
                 boundedMax = rectangle.GetArea();
                 break;

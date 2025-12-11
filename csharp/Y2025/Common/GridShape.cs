@@ -9,7 +9,7 @@ public sealed class GridShape
         Edges = edges;
     }
 
-    public bool Contains(GridRectangle other)
+    public bool FullyContains(GridRectangle other)
     {
         return !Edges.Any(s => s.OverlapsWith(other));
     }
