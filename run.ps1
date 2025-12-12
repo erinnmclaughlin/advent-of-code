@@ -47,7 +47,7 @@ $runningAll = [string]::IsNullOrWhiteSpace($Lang)
 
 if ($runningAll) {
     # Default: attempt all three
-    $languagesToRun = @("csharp", "fsharp", "python")
+    $languagesToRun = @("csharp", "fsharp"<#, "python"#>)
 } else {
     $languagesToRun = @($Lang.ToLower())
 }
@@ -154,7 +154,7 @@ foreach ($language in $languagesToRun) {
     switch ($language) {
         "csharp" { Invoke-CSharp -RepoRoot $repoRoot -InputFile $inputFile -Year $Year -Day $Day -RunningAll $runningAll }
         "fsharp" { Invoke-FSharp -RepoRoot $repoRoot -InputFile $inputFile -Year $Year -Day $Day -RunningAll $runningAll }
-        "python" { Invoke-Python -RepoRoot $repoRoot -InputFile $inputFile -Year $Year -Day $Day -RunningAll $runningAll }
+        #"python" { Invoke-Python -RepoRoot $repoRoot -InputFile $inputFile -Year $Year -Day $Day -RunningAll $runningAll }
         default {
             if ($runningAll) {
                 Write-Warning "Unknown language in list: $language"

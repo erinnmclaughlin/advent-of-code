@@ -8,7 +8,7 @@ param(
     [int] $Day,
 
     # Which languages to scaffold; default is all
-    [string[]] $Langs = @("csharp", "fsharp", "python"),
+    [string[]] $Langs = @("csharp", "fsharp"<#, "python"#>),
 
     # Force a fresh download of the input
     [switch] $DownloadInput

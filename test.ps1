@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 param(
     # Which languages to test; default is all
-    [string[]] $Langs = @("csharp", "fsharp", "python")
+    [string[]] $Langs = @("csharp", "fsharp"<#, "python"#>)
 )
 
 $ErrorActionPreference = "Stop"
