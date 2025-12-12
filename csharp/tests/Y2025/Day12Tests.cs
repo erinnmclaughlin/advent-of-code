@@ -148,4 +148,44 @@ public sealed class Day12Tests
         Assert.Equal(expectedStart, shape.ToString());
         Assert.Equal(expectedEnd, flippedShape.ToString());
     }
+
+    [Fact]
+    public void Try_add_shape_succeeds_when_shape_fits()
+    {
+        var shape = Day12.ParseInput(Sample).Shapes[0];
+        var bigShape = new Day12.LargeGridShape(3, 3);
+
+        Assert.True(bigShape.TryAdd(shape));
+        Assert.All(shape.Cells, c => Assert.Contains(c, bigShape.Cells));
+    }
+
+    [Fact]
+    public void Try_add_shape_fails_when_shape_does_not_fit()
+    {
+        var shape = Day12.ParseInput(Sample).Shapes[0];
+        var bigShape = new Day12.LargeGridShape(2, 2);
+        
+        Assert.False(bigShape.TryAdd(shape));
+        Assert.Empty(bigShape.Cells);
+    }
+
+    [Fact]
+    public void Try_add_shape_fails_when_offset_places_out_of_bounds()
+    {
+        var shape = Day12.ParseInput(Sample).Shapes[0];
+        var bigShape = new Day12.LargeGridShape(3, 3);
+        
+        Assert.False(bigShape.TryAdd(shape, 1, 1));
+        Assert.Empty(bigShape.Cells);
+    }
+
+    [Fact]
+    public void Try_add_shape_fails_when_big_shape_already_contains_cell()
+    {
+        var shape = Day12.ParseInput(Sample).Shapes[0];
+        var bigShape = new Day12.LargeGridShape(3, 3);
+        bigShape.Cells.Add(new GridCell(0, 0));
+        Assert.False(bigShape.TryAdd(shape));
+        Assert.Single(bigShape.Cells);
+    }
 }

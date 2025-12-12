@@ -61,8 +61,8 @@ public sealed class Day12() : AdventDay(2025, 12)
 
         public bool TryAdd(SmallGridShape shape, int topOffset = 0, int leftOffset = 0)
         {
-            if (shape.Cells.Max(c => c.Row) + topOffset > Height) return false;
-            if (shape.Cells.Max(c => c.Col) + leftOffset > Width) return false;
+            if (shape.Cells.Max(c => c.Row) + topOffset + 1 > Height) return false;
+            if (shape.Cells.Max(c => c.Col) + leftOffset + 1 > Width) return false;
             
             var cellsToAdd = new HashSet<GridCell>();
 
