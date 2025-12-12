@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics;
 using System.Text;
 
@@ -22,7 +23,7 @@ public sealed class Day10() : AdventDay(2025, 10)
     public override AdventDaySolution Solve(string input)
     {
         var instructions = ParseInput(input);
-        var (part1, part2) = (0, 0);
+        var (part1, part2) = (0L, 0L);
         
         var stopwatch = new Stopwatch();
         
@@ -38,7 +39,7 @@ public sealed class Day10() : AdventDay(2025, 10)
             stopwatch.Reset();
             
             stopwatch.Start();
-            var nextPart2 = CountFewestStepsForJoltageMeter(instruction);
+            var nextPart2 = CountFewestStepsForJoltageMeter_WithRecursion(instruction);
             part2 += nextPart2;
             stopwatch.Stop();
             Console.WriteLine("Part 2: {0} (Time: {1})", nextPart2, stopwatch.Elapsed);
@@ -52,7 +53,6 @@ public sealed class Day10() : AdventDay(2025, 10)
         .GetLines(input)
         .Select(Instruction.Parse)
         .ToArray();
-
     
     public static int CountFewestStepsForIndicatorLight(Instruction instruction)
     {
@@ -96,27 +96,107 @@ public sealed class Day10() : AdventDay(2025, 10)
         return sb.ToString();
     }
 
-    public static int CountFewestStepsForJoltageMeter(Instruction instruction)
+    public static long CountFewestStepsForJoltageMeter_WithRecursion(Instruction instruction)
     {
-        var prioritizedButtons = instruction.Buttons.Index().OrderBy(bi => GetMaxPushes(bi.Item, instruction.JoltageRequirements)).Select(x => x.Index).ToArray();
-        var queue = CreateQueue(prioritizedButtons.Select(b => (NextButton: b, State: instruction.JoltageRequirements, StepCount: 1)));
+        var memory = new Dictionary<int, long>();
+        var best = long.MaxValue;
+        var prioritizedButtons = instruction.Buttons
+            .OrderBy(b => GetMaxPushes(b, instruction.JoltageRequirements))
+            .ToArray();
+        
+        foreach (var button in prioritizedButtons)
+        {
+            var count = CountFewestStepsForJoltageMeter(
+                prioritizedButtons,
+                new PartTwoState(instruction.JoltageRequirements, button),
+                0,
+                ref best,
+                memory);
+            
+            if (count != -1)
+                best = Math.Min(best, count);
+        }
+
+        return best;
+    }
+    
+    private static long CountFewestStepsForJoltageMeter(
+        int[][] prioritizedButtons,
+        PartTwoState current,
+        long stepCount,
+        ref long knownBest, 
+        Dictionary<int, long> memory)
+    {
+        if (stepCount > knownBest)
+            return -1;
+
+        if (memory.TryGetValue(current.Hash, out var count))
+        {
+            return count == -1 ? -1 : stepCount + count + 1;
+        }
+        
+        var (canGet, isComplete) = TryGetNextJoltageMeter(current.NextButton, current.JoltageMeter, out var nextMeter);
+
+        if (!canGet)
+        {
+            memory[current.Hash] = -1;
+            return -1;
+        }
+
+        if (isComplete)
+        {
+            knownBest = stepCount;
+            memory[current.Hash] = stepCount;
+            return stepCount;
+        }
+        
+        stepCount++;
+
+        var min = -1L;
+
+        foreach (var button in prioritizedButtons)
+        {
+            var nextCount = CountFewestStepsForJoltageMeter(prioritizedButtons, new(nextMeter, button), stepCount, ref knownBest, memory);
+            if (min == -1 || nextCount < min)
+                min = nextCount;
+        }
+
+        memory[current.Hash] = min;
+        return min;
+    }
+    
+    public static int CountFewestStepsForJoltageMeter_WithQueue(Instruction instruction, HashSet<int>? seenStates = null)
+    {
+        seenStates ??= [];
+        var prioritizedButtons = instruction.Buttons.Index().OrderBy(bi => GetMaxPushes(bi.Item, instruction.JoltageRequirements)).Select(x => x.Item).ToArray();
+        var queue = CreateQueue(prioritizedButtons.Select(b => (State: new PartTwoState(instruction.JoltageRequirements, b), StepCount: 1)));
         
         while (queue.TryDequeue(out var current))
         {
-            var currentButton = instruction.Buttons[current.NextButton];
-            var (canGet, isComplete) = TryGetNextJoltageMeter(currentButton, current.State, out var nextMeter);
+            if (!seenStates.Add(current.State.Hash))
+                continue;
             
-            if (!canGet) continue;
-            
-            if (isComplete) return current.StepCount;
-            
-            foreach (var b in prioritizedButtons)
-                queue.Enqueue((b, nextMeter, current.StepCount + 1));
-        }
-        
-        return 0;
-    }
+            var (canGet, isComplete) = TryGetNextJoltageMeter(current.State.NextButton, current.State.JoltageMeter, out var nextMeter);
 
+            if (!canGet)
+            {
+                continue;
+            }
+
+            if (isComplete)
+            {
+                return current.StepCount;
+            }
+
+            foreach (var b in prioritizedButtons)
+            {
+                queue.Enqueue((new PartTwoState(nextMeter, b), current.StepCount + 1));
+            }
+        }
+
+        return -1;
+    }
+    
     private static int GetMaxPushes(int[] button, int[] joltages)
     {
         return button.Min(i => joltages[i]);
@@ -142,4 +222,21 @@ public sealed class Day10() : AdventDay(2025, 10)
     }
     
     private static Queue<T> CreateQueue<T>(IEnumerable<T> items) => new(items);
+
+    private sealed class PartTwoState
+    {
+        public int[] JoltageMeter { get; }
+        public int[] NextButton { get; }
+        public int Hash { get; }
+        
+        public PartTwoState(int[] joltageMeter, int[] nextButton)
+        {
+            JoltageMeter = joltageMeter;
+            NextButton = nextButton;
+            Hash = HashCode.Combine(
+                StructuralComparisons.StructuralEqualityComparer.GetHashCode(nextButton),
+                StructuralComparisons.StructuralEqualityComparer.GetHashCode(joltageMeter)
+            );
+        }
+    }
 }
