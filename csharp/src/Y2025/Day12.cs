@@ -58,18 +58,7 @@ public sealed class Day12() : AdventDay(2025, 12)
 
         public SmallGridShape GetRotatedLeft()
         {
-            var rightCells = Cells.Where(c => c.Row == 0).Select(c => new GridCell(2, c.Col));
-            var bottomCells = Cells.Where(c => c.Col == 2).Select(c => new GridCell(2 - c.Row, 2));
-            var leftCells = Cells.Where(c => c.Row == 2).Select(c => new GridCell(0, c.Col));
-            var topCells = Cells.Where(c => c.Col == 0).Select(c => new GridCell(2 - c.Row, 0));
-            
-            HashSet<GridCell> allCells = 
-                [..rightCells, ..bottomCells, ..leftCells, ..topCells];
-            
-            if (Cells.Any(c => c.Col == 1 && c.Row == 1))
-                allCells.Add(new GridCell(1, 1));
-            
-            return new SmallGridShape(allCells);
+            return new SmallGridShape(Cells.Select(c => new GridCell(2 - c.Row, c.Col)).ToHashSet());
         }
 
         public override string ToString()
