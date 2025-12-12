@@ -43,8 +43,8 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: |
-            tests/**/coverage.cobertura.xml
-            python/coverage.xml
+            **/tests/coverage.cobertura.xml
+      #      python/coverage.xml
           fail_ci_if_error: true
       
       # --- Upload coverage to Codecov ---
@@ -53,6 +53,6 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           files: |
-            tests/TestResults.xml
-            tests/**/TestResults.xml  
+            **/tests/TestResults.xml
+            **/tests/**/TestResults.xml  
           token: ${{ secrets.CODECOV_TOKEN }}

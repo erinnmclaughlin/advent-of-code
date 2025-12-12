@@ -17,7 +17,7 @@ $repoRoot = Resolve-Path $PSScriptRoot
 # C# Tests
 # -----------------------------
 if ($Langs -contains "csharp") {
-    $csharpTests = Join-Path $repoRoot "tests/csharp/AdventOfCode.CSharp.Tests.csproj"
+    $csharpTests = Join-Path $repoRoot "csharp/tests/AdventOfCode.Tests.csproj"
     
     if (Test-Path $csharpTests) {
         Write-Host ""
@@ -35,7 +35,7 @@ if ($Langs -contains "csharp") {
 # F# Tests
 # -----------------------------
 if ($Langs -contains "fsharp") {
-    $fsharpTests = Join-Path $repoRoot "tests/fsharp/AdventOfCode.FSharp.Tests.fsproj"
+    $fsharpTests = Join-Path $repoRoot "fsharp/tests/AdventOfCode.Tests.fsproj"
     
     if (Test-Path $fsharpTests) {
         Write-Host ""
@@ -53,7 +53,7 @@ if ($Langs -contains "fsharp") {
 # -----------------------------
 if ($Langs -contains "python") {
     $pythonRoot = Join-Path $repoRoot "python"
-    $pytestPath = Join-Path $repoRoot "tests/python"
+    $pytestPath = Join-Path $repoRoot "python/tests"
     
     $hasPython = Test-Path $pythonRoot
     $hasPyTests = Test-Path $pytestPath

@@ -71,7 +71,7 @@ if ($Langs -contains "csharp") {
     Write-Host ""
     Write-Host "C#:"
     
-    $csDir = Join-Path $repoRoot "csharp/Y$Year"
+    $csDir = Join-Path $repoRoot "csharp/src/Y$Year"
     $csFile = Join-Path $csDir "Day$dayPadded.cs"
 
     $csContent = @"
@@ -93,7 +93,7 @@ public sealed class Day$dayPadded() : AdventDay($Year, $Day)
     New-FileIfMissing -Path $csFile -Content $csContent
 
     # C# tests
-    $csTestDir = Join-Path $repoRoot "tests/csharp/Y$Year"
+    $csTestDir = Join-Path $repoRoot "csharp/tests/Y$Year"
     $csTestFile = Join-Path $csTestDir "Day${dayPadded}Tests.cs"
 
     $csTestContent = @"
@@ -137,7 +137,7 @@ if ($Langs -contains "fsharp") {
     Write-Host ""
     Write-Host "F#:"
 
-    $fsDir = Join-Path $repoRoot "fsharp/Y$Year"
+    $fsDir = Join-Path $repoRoot "fsharp/src/Y$Year"
     $fsFile = Join-Path $fsDir "Day$dayPadded.fs"
 
     $fsContent = @"
@@ -169,8 +169,7 @@ type Day$dayPadded() =
 
     New-FileIfMissing -Path $fsFile -Content $fsContent
 
-    # Add + sort Compile includes for puzzle sources in fsharp/AdventOfCode.FSharp.fsproj
-    $fsprojPath = Join-Path $repoRoot "fsharp/AdventOfCode.FSharp.fsproj"
+    $fsprojPath = Join-Path $repoRoot "fsharp/tests/AdventOfCode.Tests.fsproj"
     $fsprojContent = Get-Content $fsprojPath -Raw
 
 
@@ -215,7 +214,7 @@ type Day$dayPadded() =
     }
 
     # F# tests
-    $fsTestDir = Join-Path $repoRoot "tests/fsharp/Y$Year"
+    $fsTestDir = Join-Path $repoRoot "fsharp/tests/Y$Year"
     $fsTestFile = Join-Path $fsTestDir "Day${dayPadded}Tests.fs"
 
     $fsTestContent = @"
@@ -242,8 +241,7 @@ type Day${dayPadded}Tests() =
 
     New-FileIfMissing -Path $fsTestFile -Content $fsTestContent
 
-    # Add + sort Compile includes for test files in tests/fsharp/AdventOfCode.FSharp.Tests.fsproj
-    $fsTestProjPath = Join-Path $repoRoot "tests/fsharp/AdventOfCode.FSharp.Tests.fsproj"
+    $fsTestProjPath = Join-Path $repoRoot "fsharp/tests/AdventOfCode.Tests.fsproj"
     $fsTestProjContent = Get-Content $fsTestProjPath -Raw
 
 
@@ -294,7 +292,7 @@ if ($Langs -contains "python") {
     Write-Host ""
     Write-Host "Python:"
 
-    $pyYearDir = Join-Path $repoRoot "python/y$Year"
+    $pyYearDir = Join-Path $repoRoot "python/src/y$Year"
     $pyFile = Join-Path $pyYearDir "day$dayPadded.py"
 
     $pyContent = @"
@@ -315,7 +313,7 @@ def solve(input_data: str) -> tuple[str, str]:
     New-FileIfMissing -Path $pyFile -Content $pyContent
 
     # Python tests
-    $pyTestDir = Join-Path $repoRoot "tests/python"
+    $pyTestDir = Join-Path $repoRoot "python/tests"
     $pyTestFile = Join-Path $pyTestDir "test_y$Year`_day$dayPadded.py"
 
     $pyTestContent = @"
