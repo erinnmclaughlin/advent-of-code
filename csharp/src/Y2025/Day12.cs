@@ -24,7 +24,7 @@ public sealed class Day12() : AdventDay(2025, 12)
         {
             if (lines[i].EndsWith(':'))
             {
-                var cells = ParseCells(lines[(i + 1)..(i + 3)]);
+                var cells = ParseCells(lines[(i + 1)..(i + 4)]);
                 shapes.Add(new SmallGridShape(cells.ToHashSet()));
                 i += 4;
                 continue;
@@ -46,7 +46,8 @@ public sealed class Day12() : AdventDay(2025, 12)
         {
             for (var col = 0; col < lines[row].Length; col++)
             {
-                yield return new GridCell(col, row);
+                if (lines[row][col] == '#')
+                    yield return new GridCell(col, row);
             }
         }
     }
@@ -54,5 +55,39 @@ public sealed class Day12() : AdventDay(2025, 12)
     public sealed class SmallGridShape(HashSet<GridCell> cells)
     {
         public HashSet<GridCell> Cells { get; } = cells;
+
+        public SmallGridShape GetRotatedLeft()
+        {
+            var rightCells = Cells.Where(c => c.Row == 0).Select(c => new GridCell(2, c.Col));
+            var bottomCells = Cells.Where(c => c.Col == 2).Select(c => new GridCell(2 - c.Row, 2));
+            var leftCells = Cells.Where(c => c.Row == 2).Select(c => new GridCell(0, c.Col));
+            var topCells = Cells.Where(c => c.Col == 0).Select(c => new GridCell(c.Row, 0));
+            
+            HashSet<GridCell> allCells = 
+                [..rightCells, ..bottomCells, ..leftCells, ..topCells];
+            
+            if (Cells.Any(c => c.Col == 1 && c.Row == 1))
+                allCells.Add(new GridCell(1, 1));
+            
+            return new SmallGridShape(allCells);
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            for (var row = 0; row < 3; row++)
+            {
+                for (var col = 0; col < 3; col++)
+                {
+                    var hasCell = Cells.Any(c => c.Row == row && c.Col == col);
+                    sb.Append(hasCell ? '#' : '.');
+                }
+                
+                sb.AppendLine();
+            }
+            
+            return sb.ToString().TrimEnd();
+        }
     }
 }
