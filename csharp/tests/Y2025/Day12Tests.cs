@@ -65,7 +65,7 @@ public sealed class Day12Tests
         var (shapes, instructions) = Day12.ParseInput(Sample);
         
         Assert.Equal(6, shapes.Count);
-        Assert.Equal(3, instructions.Length);
+        Assert.Equal(3, instructions.Count);
 
         var shape = shapes[0];
         
@@ -83,6 +83,16 @@ public sealed class Day12Tests
         Assert.Contains(new GridCell(0, 2), shape.Cells);
         Assert.Contains(new GridCell(1, 2), shape.Cells);
         Assert.DoesNotContain(new GridCell(2, 2), shape.Cells);
+        
+        // first instruction
+        Assert.Equal(4, instructions[0].BigShape.Height);
+        Assert.Equal(4, instructions[0].BigShape.Width);
+        Assert.Equal(6, instructions[0].Target.Length);
+        Assert.Equivalent(new[] { 0, 0, 0, 0, 2, 0 }, instructions[0].Target);
+        
+        // second instruction
+        Assert.Equal(12, instructions[1].BigShape.Width);
+        Assert.Equal(5, instructions[1].BigShape.Height);
     }
     
     [Theory]

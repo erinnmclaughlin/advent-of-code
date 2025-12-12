@@ -13,12 +13,12 @@ public sealed class Day12() : AdventDay(2025, 12)
 
         return ("", "");
     }
-
-    public static (List<SmallGridShape> Shapes, string[] Instructions) ParseInput(string input)
+    
+    public static (List<SmallGridShape> Shapes, List<(LargeGridShape BigShape, int[] Target)> Instructions) ParseInput(string input)
     {
         var shapes = new List<SmallGridShape>();
         var lines = InputHelper.GetLines(input);
-        var instructions = new string[] { };
+        var instructions = new List<(LargeGridShape BigShape, int[] Target)>();
         
         for (var i = 0; i < lines.Length; i++)
         {
@@ -30,11 +30,12 @@ public sealed class Day12() : AdventDay(2025, 12)
                 continue;
             }
 
-            //if (lines[i].Contains('#') || lines[i].Contains('.'))
-            //    continue;
+            var instructionParts = lines[i].Split(' ');
+            var bigShapeParts = instructionParts[0].TrimEnd(':').Split('x');
+            var bigShape = new LargeGridShape(int.Parse(bigShapeParts[1]), int.Parse(bigShapeParts[0]));
+            var targets = instructionParts[1..].Select(int.Parse).ToArray();
 
-            instructions = lines[i..];
-            break;
+            instructions.Add((bigShape, targets));
         }
 
         return (shapes, instructions);
@@ -52,6 +53,36 @@ public sealed class Day12() : AdventDay(2025, 12)
         }
     }
 
+    public sealed class LargeGridShape(int height, int width)
+    {
+        public HashSet<GridCell> Cells { get; } = [];
+        public int Height { get; } = height;
+        public int Width { get; } = width;
+
+        public bool TryAdd(SmallGridShape shape, int topOffset = 0, int leftOffset = 0)
+        {
+            if (shape.Cells.Max(c => c.Row) + topOffset > Height) return false;
+            if (shape.Cells.Max(c => c.Col) + leftOffset > Width) return false;
+            
+            var cellsToAdd = new HashSet<GridCell>();
+
+            foreach (var cell in shape.Cells)
+            {
+                var newCell = new GridCell(cell.Col + leftOffset, cell.Row + topOffset);
+
+                if (Cells.Contains(newCell))
+                    return false;
+                
+                cellsToAdd.Add(newCell);
+            }
+
+            foreach (var cell in cellsToAdd)
+                Cells.Add(cell);
+            
+            return true;
+        }
+    }
+    
     public sealed class SmallGridShape(HashSet<GridCell> cells)
     {
         public HashSet<GridCell> Cells { get; } = cells;
