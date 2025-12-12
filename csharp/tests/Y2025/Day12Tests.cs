@@ -200,5 +200,19 @@ public sealed class Day12Tests
         Assert.True(Day12.TryFit(bigShape, smallShape2));
         Assert.Equal(6, bigShape.Cells.Count);
     }
-    
+
+    [Fact]
+    public void Enumerate_available_positions_returns_all_options()
+    {
+        var bigShape = new Day12.LargeGridShape(4, 4);
+        
+        // ###
+        // #..
+        // ###
+        var shape = Day12.ParseInput(Sample).Shapes[4];
+        bigShape.TryAdd(shape);
+        
+        var numberOfOptions = bigShape.EnumerateAvailablePositions(shape).Distinct().Count();
+        Assert.Equal(1, numberOfOptions);
+    }
 }
