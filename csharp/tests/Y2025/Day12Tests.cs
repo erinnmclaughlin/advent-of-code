@@ -85,25 +85,19 @@ public sealed class Day12Tests
         Assert.DoesNotContain(new GridCell(2, 2), shape.Cells);
     }
     
-    [Fact]
-    public void CanRotateShape()
+    [Theory]
+    [InlineData(0, "###\n##.\n##.", "###\n###\n..#")]
+    [InlineData(1, "###\n##.\n.##", ".##\n###\n#.#")]
+    [InlineData(2, ".##\n###\n##.", "##.\n###\n.##")]
+    [InlineData(3, "##.\n###\n##.", "###\n###\n.#.")]
+    [InlineData(4, "###\n#..\n###", "###\n#.#\n#.#")]
+    [InlineData(5, "###\n.#.\n###", "#.#\n###\n#.#")]
+    public void CanRotateShape(int index, string expectedStart, string expectedEnd)
     {
-        var shape = Day12.ParseInput(Sample).Shapes[0];
+        var shapes = Day12.ParseInput(Sample).Shapes;
+
+        var shape = shapes[index];
         var rotatedShape = shape.GetRotatedLeft();
-
-        var expectedStart =
-            """
-            ###
-            ##.
-            ##.
-            """;
-
-        var expectedEnd =
-            """
-            ###
-            ###
-            ..#
-            """;
 
         Assert.Equal(expectedStart, shape.ToString());
         Assert.Equal(expectedEnd, rotatedShape.ToString());

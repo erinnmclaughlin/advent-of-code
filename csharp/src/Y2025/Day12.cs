@@ -61,7 +61,7 @@ public sealed class Day12() : AdventDay(2025, 12)
             var rightCells = Cells.Where(c => c.Row == 0).Select(c => new GridCell(2, c.Col));
             var bottomCells = Cells.Where(c => c.Col == 2).Select(c => new GridCell(2 - c.Row, 2));
             var leftCells = Cells.Where(c => c.Row == 2).Select(c => new GridCell(0, c.Col));
-            var topCells = Cells.Where(c => c.Col == 0).Select(c => new GridCell(c.Row, 0));
+            var topCells = Cells.Where(c => c.Col == 0).Select(c => new GridCell(2 - c.Row, 0));
             
             HashSet<GridCell> allCells = 
                 [..rightCells, ..bottomCells, ..leftCells, ..topCells];
