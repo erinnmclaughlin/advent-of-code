@@ -13,6 +13,35 @@ public sealed class Day12() : AdventDay(2025, 12)
 
         return ("", "");
     }
+
+    public static bool TryFit(LargeGridShape bigShape, SmallGridShape smallShape)
+    {
+        var shapes = new List<SmallGridShape>
+        {
+            smallShape,
+            smallShape.GetFlippedVertical(),
+            smallShape.GetFlippedHorizontal(),
+            smallShape.GetFlippedVertical().GetFlippedHorizontal()
+        };
+
+        foreach (var shape in shapes)
+        {
+            for (var i = 0; i < 5; i++)
+            {
+                var toTry = shape.GetRotatedLeft();
+                for (var row = 0; row < bigShape.Width - 2; row++)
+                {
+                    for (var col = 0; col < bigShape.Height - 2; col++)
+                    {
+                        if (bigShape.TryAdd(toTry, row, col))
+                            return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
     
     public static (List<SmallGridShape> Shapes, List<(LargeGridShape BigShape, int[] Target)> Instructions) ParseInput(string input)
     {

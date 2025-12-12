@@ -188,4 +188,17 @@ public sealed class Day12Tests
         Assert.False(bigShape.TryAdd(shape));
         Assert.Single(bigShape.Cells);
     }
+
+    [Fact]
+    public void Try_fit_can_find_position_for_basic_shape()
+    {
+        var bigShape = new Day12.LargeGridShape(3, 3);
+        var smallShape1 = new Day12.SmallGridShape([new GridCell(0, 0), new GridCell(0, 1), new GridCell(0, 2)]);
+        var smallShape2 = new Day12.SmallGridShape([new GridCell(1, 0), new GridCell(1, 1), new GridCell(1, 2)]);
+        
+        Assert.True(Day12.TryFit(bigShape, smallShape1));
+        Assert.True(Day12.TryFit(bigShape, smallShape2));
+        Assert.Equal(6, bigShape.Cells.Count);
+    }
+    
 }
