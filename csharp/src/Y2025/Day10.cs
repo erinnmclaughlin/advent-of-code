@@ -109,7 +109,7 @@ public sealed class Day10() : AdventDay(2025, 10)
             var count = CountFewestStepsForJoltageMeter(
                 prioritizedButtons,
                 new PartTwoState(instruction.JoltageRequirements, button),
-                0,
+                1,
                 ref best,
                 memory);
             
