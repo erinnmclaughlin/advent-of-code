@@ -1,4 +1,4 @@
-namespace AdventOfCode;
+namespace AdventOfCode.Common;
 
 public static class InputHelper
 {

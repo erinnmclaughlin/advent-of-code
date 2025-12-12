@@ -1,6 +1,4 @@
-﻿using AdventOfCode.Common;
-
-namespace AdventOfCode.Y2025.Common;
+﻿namespace AdventOfCode.Y2025.Common;
 
 public sealed record GridCell(int Col, int Row) : AdventCell(Row, Col)
 {
