@@ -102,4 +102,46 @@ public sealed class Day12Tests
         Assert.Equal(expectedStart, shape.ToString());
         Assert.Equal(expectedEnd, rotatedShape.ToString());
     }
+
+    /*
+        ###
+        ##.
+        .##
+     */
+    
+    [Theory]
+    [InlineData(0, "###\n##.\n##.", "###\n.##\n.##")]
+    [InlineData(1, "###\n##.\n.##", "###\n.##\n##.")]
+    [InlineData(2, ".##\n###\n##.", "##.\n###\n.##")]
+    [InlineData(3, "##.\n###\n##.", ".##\n###\n.##")]
+    [InlineData(4, "###\n#..\n###", "###\n..#\n###")]
+    [InlineData(5, "###\n.#.\n###", "###\n.#.\n###")]
+    public void CanVerticallyFlipShape(int index, string expectedStart, string expectedEnd)
+    {
+        var shapes = Day12.ParseInput(Sample).Shapes;
+
+        var shape = shapes[index];
+        var flippedShape = shape.GetFlippedVertical();
+
+        Assert.Equal(expectedStart, shape.ToString());
+        Assert.Equal(expectedEnd, flippedShape.ToString());
+    }
+
+    [Theory]
+    [InlineData(0, "###\n##.\n##.", "##.\n##.\n###")]
+    [InlineData(1, "###\n##.\n.##", ".##\n##.\n###")]
+    [InlineData(2, ".##\n###\n##.", "##.\n###\n.##")]
+    [InlineData(3, "##.\n###\n##.", "##.\n###\n##.")]
+    [InlineData(4, "###\n#..\n###", "###\n#..\n###")]
+    [InlineData(5, "###\n.#.\n###", "###\n.#.\n###")]
+    public void CanHorizontallyFlipShape(int index, string expectedStart, string expectedEnd)
+    {
+        var shapes = Day12.ParseInput(Sample).Shapes;
+        
+        var shape = shapes[index];
+        var flippedShape = shape.GetFlippedHorizontal();
+        
+        Assert.Equal(expectedStart, shape.ToString());
+        Assert.Equal(expectedEnd, flippedShape.ToString());
+    }
 }

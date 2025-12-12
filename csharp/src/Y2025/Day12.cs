@@ -56,6 +56,16 @@ public sealed class Day12() : AdventDay(2025, 12)
     {
         public HashSet<GridCell> Cells { get; } = cells;
 
+        public SmallGridShape GetFlippedVertical()
+        {
+            return new SmallGridShape(Cells.Select(c => new GridCell(2 - c.Col, c.Row)).ToHashSet());
+        }
+
+        public SmallGridShape GetFlippedHorizontal()
+        {
+            return new SmallGridShape(Cells.Select(c => new GridCell(c.Col, 2 - c.Row)).ToHashSet());
+        }
+        
         public SmallGridShape GetRotatedLeft()
         {
             return new SmallGridShape(Cells.Select(c => new GridCell(2 - c.Row, c.Col)).ToHashSet());
