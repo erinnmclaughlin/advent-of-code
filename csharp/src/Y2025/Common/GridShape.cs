@@ -2,16 +2,22 @@ namespace AdventOfCode.Y2025.Common;
 
 public sealed class GridShape
 {
+    public GridRectangle BoundingBox { get; }
     public IReadOnlySet<GridRectangle> Edges { get; }
     
     private GridShape(HashSet<GridRectangle> edges)
     {
         Edges = edges;
+        BoundingBox = new GridRectangle(
+            new GridCell(edges.Min(e => e.Left), edges.Min(e => e.Top)),
+            new GridCell(edges.Max(e => e.Right), edges.Max(e => e.Bottom))
+        );
     }
 
-    public bool FullyContains(GridRectangle other)
+    public bool IsSupershapeOf(GridRectangle other)
     {
-        return !Edges.Any(s => s.OverlapsWith(other));
+        return BoundingBox.IsSupershapeOf(other) && 
+               !Edges.Any(s => s.OverlapsWith(other));
     }
 
     public static GridShape CreateFromCorners(HashSet<GridCell> corners)

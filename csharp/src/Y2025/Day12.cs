@@ -204,7 +204,7 @@ public sealed class Day12() : AdventDay(2025, 12)
                     sb.Append(hasCell ? '#' : '.');
                 }
                 
-                sb.AppendLine();
+                sb.Append('\n');
             }
             
             return sb.ToString().TrimEnd();

@@ -32,32 +32,39 @@ public sealed class GridRectangle
         BottomLeft = new GridCell(left, bottom);
     }
     
-    public long GetArea()
-    {
-        return Math.BigMul(Width, Height);
-    }
+    public bool Contains(GridCell cell) =>
+        cell.Row >= Top && 
+        cell.Row <= Bottom && 
+        cell.Col >= Left &&
+        cell.Col <= Right;
 
-    public bool Contains(GridCell cell)
-    {
-        return cell.Row >= Top && cell.Row <= Bottom && cell.Col >= Left && cell.Col <= Right;
-    }
+    public long GetArea() => 
+        Math.BigMul(Width, Height);
 
-    public bool FullyContains(GridRectangle other)
-    {
-        return other.Top >= Top && other.Bottom <= Bottom && other.Left >= Left && other.Right <= Right;
-    }
+    public bool IsSubshapeOf(GridRectangle other) => 
+        other.IsSupershapeOf(this);
+    
+    public bool IsSubshapeOf(GridShape other) => 
+        other.IsSupershapeOf(this);
 
-    public bool OverlapsWith(GridRectangle other)
-    {
+    public bool IsSupershapeOf(GridRectangle other) => 
+        Top <= other.Top && 
+        Bottom >= other.Bottom && 
+        Left <= other.Left && 
+        Right >= other.Right;
+
+    public bool OverlapsWith(GridRectangle other) =>
         // if other starts before this ends, or vice versa, both vertically and horizontally, then there's no overlap
-        return Right > other.Left && 
-               Left < other.Right &&
-               Bottom > other.Top &&
-               Top < other.Bottom;
-    }
+        Right > other.Left && 
+        Left < other.Right &&
+        Bottom > other.Top &&
+        Top < other.Bottom;
 
-    public bool IsOnEdge(GridCell cell)
-    {
-        return Contains(cell) && cell.Row == Top || cell.Row == Bottom || cell.Col == Left || cell.Col == Right;
-    }
+    public bool IsOnEdge(GridCell cell) =>
+        Contains(cell) && (
+            cell.Row == Top || 
+            cell.Row == Bottom || 
+            cell.Col == Left || 
+            cell.Col == Right
+        );
 }

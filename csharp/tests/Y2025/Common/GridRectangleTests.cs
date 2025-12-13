@@ -68,7 +68,7 @@ public sealed class GridRectangleTests
         var bottomRight = new GridCell(5, 5);
         var rectangle = new GridRectangle(topLeft, bottomRight);
         var inside = new GridRectangle(new GridCell(2, 2), new GridCell(3, 3));
-        Assert.True(rectangle.FullyContains(inside));
+        Assert.True(rectangle.IsSupershapeOf(inside));
     }
 
     [Fact]
@@ -78,8 +78,8 @@ public sealed class GridRectangleTests
         var bottomRight = new GridCell(5, 5);
         var rectangle1 = new GridRectangle(topLeft, bottomRight);
         var rectangle2 = new GridRectangle(topLeft, bottomRight);
-        Assert.True(rectangle1.FullyContains(rectangle2));
-        Assert.True(rectangle2.FullyContains(rectangle1));
+        Assert.True(rectangle1.IsSupershapeOf(rectangle2));
+        Assert.True(rectangle2.IsSupershapeOf(rectangle1));
     }
     
     [Fact]
@@ -89,7 +89,7 @@ public sealed class GridRectangleTests
         var bottomRight = new GridCell(5, 5);
         var rectangle = new GridRectangle(topLeft, bottomRight);
         var outside = new GridRectangle(new GridCell(6, 6), new GridCell(7, 7));
-        Assert.False(rectangle.FullyContains(outside));
+        Assert.False(rectangle.IsSupershapeOf(outside));
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public sealed class GridRectangleTests
         var bottomRight = new GridCell(5, 5);
         var rectangle = new GridRectangle(topLeft, bottomRight);
         var inside = new GridRectangle(new GridCell(1, 1), new GridCell(4, 4));
-        Assert.False(inside.FullyContains(rectangle));
+        Assert.False(inside.IsSupershapeOf(rectangle));
     }
 
     [Fact]
