@@ -14,13 +14,11 @@ public sealed class GridShape
         );
     }
 
-    public bool IsSupershapeOf(GridRectangle other)
-    {
-        return BoundingBox.IsSupershapeOf(other) && 
-               !Edges.Any(s => s.OverlapsWith(other));
-    }
+    public bool IsSupershapeOf(GridRectangle other) =>
+        BoundingBox.OverlapsWith(other) && 
+        !Edges.Any(s => s.OverlapsWith(other));
 
-    public static GridShape CreateFromCorners(HashSet<GridCell> corners)
+    public static GridShape CreateFromCorners(params HashSet<GridCell> corners)
     {
         if (corners.Count == 0)
             throw new ArgumentOutOfRangeException(nameof(corners), "At least one corner must be specified.");
