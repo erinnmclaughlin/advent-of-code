@@ -1,5 +1,4 @@
 using AdventOfCode.Y2025;
-using AdventOfCode.Y2025.Common;
 
 namespace AdventOfCode.Tests.Y2025;
 

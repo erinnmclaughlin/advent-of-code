@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Text;
-using AdventOfCode.Y2025.Common;
 
 namespace AdventOfCode.Y2025;
 

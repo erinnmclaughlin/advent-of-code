@@ -1,5 +1,3 @@
-using AdventOfCode.Y2025.Common;
-
 namespace AdventOfCode.Y2024;
 
 public sealed class Day12() : AdventDay(2024, 12)

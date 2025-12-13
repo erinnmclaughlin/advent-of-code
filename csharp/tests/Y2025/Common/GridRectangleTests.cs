@@ -1,6 +1,4 @@
-﻿using AdventOfCode.Y2025.Common;
-
-namespace AdventOfCode.Tests.Y2025.Common;
+﻿namespace AdventOfCode.Tests.Y2025.Common;
 
 public sealed class GridRectangleTests
 {
