@@ -41,6 +41,18 @@ public sealed class GridRectangle
     public long GetArea() => 
         Math.BigMul(Width, Height);
 
+    public bool IsAbove(GridCell cell) =>
+        Top > cell.Row && Left <= cell.Col && Right >= cell.Col;
+    
+    public bool IsBelow(GridCell cell) =>
+        Bottom < cell.Row && Left <= cell.Col && Right >= cell.Col;
+    
+    public bool IsToTheLeftOf(GridCell cell) =>
+        Left > cell.Col && Top <= cell.Row && Bottom >= cell.Row;
+    
+    public bool IsToTheRightOf(GridCell cell) =>
+        Right < cell.Col && Top <= cell.Row && Bottom >= cell.Row;
+    
     public bool IsSubshapeOf(GridRectangle other) => 
         other.IsSupershapeOf(this);
     
@@ -54,11 +66,10 @@ public sealed class GridRectangle
         Right >= other.Right;
 
     public bool OverlapsWith(GridRectangle other) =>
-        // if other starts before this ends, or vice versa, both vertically and horizontally, then there's no overlap
-        Right > other.Left && 
-        Left < other.Right &&
-        Bottom > other.Top &&
-        Top < other.Bottom;
+        // Overlaps on the vertical axis:
+        Right > other.Left && Left < other.Right &&
+        // Overlaps on the horizontal axis:
+        Bottom > other.Top && Top < other.Bottom;
 
     public bool IsOnEdge(GridCell cell) =>
         Contains(cell) && (

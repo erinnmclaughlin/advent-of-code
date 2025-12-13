@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace AdventOfCode.Y2025.Common;
 
 public sealed class GridShape
@@ -13,6 +15,16 @@ public sealed class GridShape
             new GridCell(edges.Max(e => e.Right), edges.Max(e => e.Bottom))
         );
     }
+
+    public bool Contains(GridCell cell) => 
+        BoundingBox.Contains(cell) && 
+        // a cell is "contained" if it is an edge cell, or if it is surrounded by an odd number of edges on all sides
+        Edges.Any(e => e.Contains(cell)) || (
+            Edges.Count(e => e.IsAbove(cell)) % 2 != 0 &&
+            Edges.Count(e => e.IsBelow(cell)) % 2 != 0 &&
+            Edges.Count(e => e.IsToTheLeftOf(cell)) % 2 != 0 &&
+            Edges.Count(e => e.IsToTheRightOf(cell)) % 2 != 0
+       );
 
     public bool IsSupershapeOf(GridRectangle other) =>
         BoundingBox.OverlapsWith(other) && 
@@ -39,5 +51,22 @@ public sealed class GridShape
         }
 
         return new GridShape(edges);
+    }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        
+        for (var row = BoundingBox.Top; row <= BoundingBox.Bottom; row++)
+        {
+            for (var col = BoundingBox.Left; col <= BoundingBox.Right; col++)
+            {
+                sb.Append(Contains(new GridCell(col, row)) ? '#' : '.');
+            }
+            
+            sb.AppendLine();
+        }
+
+        return sb.ToString().TrimEnd();
     }
 }
