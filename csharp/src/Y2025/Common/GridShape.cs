@@ -2,8 +2,10 @@ using System.Text;
 
 namespace AdventOfCode.Y2025.Common;
 
-public sealed class GridShape
+public sealed class GridShape : IGridShape2D
 {
+    private readonly HashSet<GridRectangle> _innerRectangles;
+    
     public GridRectangle BoundingBox { get; }
     public IReadOnlySet<GridRectangle> Edges { get; }
     
@@ -14,44 +16,27 @@ public sealed class GridShape
             new GridCell(edges.Min(e => e.Left), edges.Min(e => e.Top)),
             new GridCell(edges.Max(e => e.Right), edges.Max(e => e.Bottom))
         );
+        _innerRectangles = EnumerateInnerRectangles().ToHashSet();
     }
 
     public bool Contains(GridCell cell)
     {
-        // If we're out of bounds entirely, then this is easy:
-        if (!BoundingBox.Contains(cell)) 
+        if (!BoundingBox.Contains(cell))
             return false;
 
-        // otherwise, a cell is "contained" if it is an edge cell, or if it is surrounded by an odd number of edges on all sides
-        var (top, bottom, left, right) = (0, 0, 0, 0);
-        foreach (var edge in Edges)
-        {
-            if (edge.Contains(cell))
-                return true;
-            
-            if (edge.IsAbove(cell)) top++;
-            if (edge.IsBelow(cell)) bottom++;
-            if (edge.IsToTheLeftOf(cell)) left++;
-            if (edge.IsToTheRightOf(cell)) right++;
-        }
-        return top % 2 != 0 && 
-               bottom % 2 != 0 && 
-               left % 2 != 0 && 
-               right % 2 != 0;
-        
-        // Original linq version, but this is less performant (loops five times instead of just once):
-        /*
-        Edges.Any(e => e.Contains(cell)) || (
-            Edges.Count(e => e.IsAbove(cell)) % 2 != 0 &&
-            Edges.Count(e => e.IsBelow(cell)) % 2 != 0 &&
-            Edges.Count(e => e.IsToTheLeftOf(cell)) % 2 != 0 &&
-            Edges.Count(e => e.IsToTheRightOf(cell)) % 2 != 0
-        );*/
+        return _innerRectangles.Any(r => r.Contains(cell));
     }
 
-    public bool IsSupershapeOf(GridRectangle other) =>
-        BoundingBox.OverlapsWith(other) && 
-        !Edges.Any(s => s.OverlapsWith(other));
+    public bool IsSupershapeOf(GridRectangle other)
+    {
+        if (!Contains(other.TopLeft) ||
+            !Contains(other.TopRight) ||
+            !Contains(other.BottomLeft) ||
+            !Contains(other.BottomRight))
+            return false;
+        
+        return !Edges.Any(s => s.OverlapsWith(other, includeEdges: false));
+    }
 
     public static GridShape CreateFromCorners(params HashSet<GridCell> corners)
     {
@@ -91,5 +76,21 @@ public sealed class GridShape
         }
 
         return sb.ToString().TrimEnd();
+    }
+
+    private IEnumerable<GridRectangle> EnumerateInnerRectangles()
+    {
+        var horizontalEdges = Edges.Where(e => e.Height == 1).ToArray();
+
+        foreach (var e1 in horizontalEdges)
+        {
+            foreach (var e2 in horizontalEdges.Where(e2 => e2.Top > e1.Top && e2.Left <= e1.Right && e1.Left <= e2.Right))
+            {
+                yield return new GridRectangle(
+                    new GridCell(Math.Max(e1.Left, e2.Left), e1.Top),
+                    new GridCell(Math.Min(e1.Right, e2.Right), e2.Top)
+                );
+            }
+        }
     }
 }

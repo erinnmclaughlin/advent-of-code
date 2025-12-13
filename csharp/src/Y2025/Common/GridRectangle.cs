@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode.Y2025.Common;
 
-public sealed class GridRectangle
+public sealed class GridRectangle : IGridShape2D
 {
     public int Top => TopLeft.Row;
     public int Right => TopRight.Col;
@@ -14,6 +14,8 @@ public sealed class GridRectangle
     public GridCell TopRight { get; }
     public GridCell BottomLeft { get; }
     public GridCell BottomRight { get; }
+
+    public GridRectangle BoundingBox => this;
 
     public GridRectangle(GridCell cell) : this(cell, cell)
     {
@@ -31,7 +33,7 @@ public sealed class GridRectangle
         TopRight = new GridCell(right, top);
         BottomLeft = new GridCell(left, bottom);
     }
-    
+
     public bool Contains(GridCell cell) =>
         cell.Row >= Top && 
         cell.Row <= Bottom && 
@@ -65,11 +67,23 @@ public sealed class GridRectangle
         Left <= other.Left && 
         Right >= other.Right;
 
-    public bool OverlapsWith(GridRectangle other) =>
-        // Overlaps on the vertical axis:
-        Right > other.Left && Left < other.Right &&
-        // Overlaps on the horizontal axis:
-        Bottom > other.Top && Top < other.Bottom;
+    public bool OverlapsWith(GridRectangle other, bool includeEdges = true)
+    {
+        if (includeEdges)
+        {
+            return Right >= other.Left && 
+                   Left <= other.Right &&
+                   Bottom >= other.Top && 
+                   Top <= other.Bottom;
+        }
+        else
+        {
+            return Right > other.Left && 
+                   Left < other.Right &&
+                   Bottom > other.Top && 
+                   Top < other.Bottom;
+        }
+    }
 
     public bool IsOnEdge(GridCell cell) =>
         Contains(cell) && (
