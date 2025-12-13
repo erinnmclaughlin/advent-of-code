@@ -28,7 +28,11 @@ public sealed class Day09() : AdventDay(2025, 9)
     
     public static IEnumerable<GridCell> ParseInput(string input)
     {
-        return InputHelper.GetLines(input).Select(GridCell.Parse);
+        foreach (var line in InputHelper.GetLines(input))
+        {
+            var parts = line.Split(',');
+            yield return new GridCell(int.Parse(parts[0]), int.Parse(parts[1]));
+        }
     }
 
     public static IEnumerable<GridRectangle> EnumerateRectangles(ICollection<GridCell> cells)

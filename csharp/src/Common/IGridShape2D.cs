@@ -1,4 +1,4 @@
-﻿namespace AdventOfCode.Y2025.Common;
+﻿namespace AdventOfCode.Common;
 
 public interface IGridShape2D
 {

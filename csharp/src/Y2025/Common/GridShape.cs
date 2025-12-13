@@ -2,7 +2,7 @@ using System.Text;
 
 namespace AdventOfCode.Y2025.Common;
 
-public sealed class GridShape : IGridShape2D
+public sealed record GridShape : IGridShape2D
 {
     private readonly HashSet<GridRectangle> _innerRectangles;
     

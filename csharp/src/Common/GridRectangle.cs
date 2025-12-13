@@ -1,6 +1,6 @@
-﻿namespace AdventOfCode.Y2025.Common;
+﻿namespace AdventOfCode.Common;
 
-public sealed class GridRectangle : IGridShape2D
+public sealed record GridRectangle : IGridShape2D
 {
     public int Top => TopLeft.Row;
     public int Right => TopRight.Col;
@@ -17,10 +17,6 @@ public sealed class GridRectangle : IGridShape2D
 
     public GridRectangle BoundingBox => this;
 
-    public GridRectangle(GridCell cell) : this(cell, cell)
-    {
-    }
-    
     public GridRectangle(GridCell c1, GridCell c2)
     {
         var top = Math.Min(c1.Row, c2.Row);
@@ -42,24 +38,6 @@ public sealed class GridRectangle : IGridShape2D
 
     public long GetArea() => 
         Math.BigMul(Width, Height);
-
-    public bool IsAbove(GridCell cell) =>
-        Top > cell.Row && Left <= cell.Col && Right >= cell.Col;
-    
-    public bool IsBelow(GridCell cell) =>
-        Bottom < cell.Row && Left <= cell.Col && Right >= cell.Col;
-    
-    public bool IsToTheLeftOf(GridCell cell) =>
-        Left > cell.Col && Top <= cell.Row && Bottom >= cell.Row;
-    
-    public bool IsToTheRightOf(GridCell cell) =>
-        Right < cell.Col && Top <= cell.Row && Bottom >= cell.Row;
-    
-    public bool IsSubshapeOf(GridRectangle other) => 
-        other.IsSupershapeOf(this);
-    
-    public bool IsSubshapeOf(GridShape other) => 
-        other.IsSupershapeOf(this);
 
     public bool IsSupershapeOf(GridRectangle other) => 
         Top <= other.Top && 
