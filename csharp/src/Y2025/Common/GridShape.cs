@@ -16,15 +16,38 @@ public sealed class GridShape
         );
     }
 
-    public bool Contains(GridCell cell) => 
-        BoundingBox.Contains(cell) && 
-        // a cell is "contained" if it is an edge cell, or if it is surrounded by an odd number of edges on all sides
+    public bool Contains(GridCell cell)
+    {
+        // If we're out of bounds entirely, then this is easy:
+        if (!BoundingBox.Contains(cell)) 
+            return false;
+
+        // otherwise, a cell is "contained" if it is an edge cell, or if it is surrounded by an odd number of edges on all sides
+        var (top, bottom, left, right) = (0, 0, 0, 0);
+        foreach (var edge in Edges)
+        {
+            if (edge.Contains(cell))
+                return true;
+            
+            if (edge.IsAbove(cell)) top++;
+            if (edge.IsBelow(cell)) bottom++;
+            if (edge.IsToTheLeftOf(cell)) left++;
+            if (edge.IsToTheRightOf(cell)) right++;
+        }
+        return top % 2 != 0 && 
+               bottom % 2 != 0 && 
+               left % 2 != 0 && 
+               right % 2 != 0;
+        
+        // Original linq version, but this is less performant (loops five times instead of just once):
+        /*
         Edges.Any(e => e.Contains(cell)) || (
             Edges.Count(e => e.IsAbove(cell)) % 2 != 0 &&
             Edges.Count(e => e.IsBelow(cell)) % 2 != 0 &&
             Edges.Count(e => e.IsToTheLeftOf(cell)) % 2 != 0 &&
             Edges.Count(e => e.IsToTheRightOf(cell)) % 2 != 0
-       );
+        );*/
+    }
 
     public bool IsSupershapeOf(GridRectangle other) =>
         BoundingBox.OverlapsWith(other) && 
