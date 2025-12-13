@@ -51,17 +51,6 @@ public sealed class Day18() : AdventDay(2024, 18)
         public List<(int X, int Y)> CorruptedPositions { get; } = [];
         public int Size { get; } = size;
 
-        public bool Try(List<(int X, int Y)> path)
-        {
-            for (var i = 0; i < path.Count; i++)
-            {
-                if (CorruptedPositions[i] == path[i])
-                    return false;
-            }
-
-            return true;
-        }
-
         public override string ToString()
         {
             var sb = new StringBuilder();

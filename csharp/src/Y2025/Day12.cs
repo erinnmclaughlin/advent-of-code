@@ -203,8 +203,8 @@ public sealed class Day12() : AdventDay(2025, 12)
                     var hasCell = Cells.Any(c => c.Row == row && c.Col == col);
                     sb.Append(hasCell ? '#' : '.');
                 }
-                
-                sb.Append('\n');
+
+                sb.AppendLine();
             }
             
             return sb.ToString().TrimEnd();

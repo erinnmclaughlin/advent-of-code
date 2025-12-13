@@ -104,6 +104,10 @@ public sealed class Day12Tests
     [InlineData(5, "###\n.#.\n###", "#.#\n###\n#.#")]
     public void Can_rotate_shape(int index, string expectedStart, string expectedEnd)
     {
+        // because i'm using both Mac and Windows
+        expectedStart = expectedStart.ReplaceLineEndings(Environment.NewLine);
+        expectedEnd = expectedEnd.ReplaceLineEndings(Environment.NewLine);
+        
         var shapes = Day12.ParseInput(Sample).Shapes;
 
         var shape = shapes[index];
@@ -122,6 +126,10 @@ public sealed class Day12Tests
     [InlineData(5, "###\n.#.\n###", "###\n.#.\n###")]
     public void Can_vertically_flip_shape(int index, string expectedStart, string expectedEnd)
     {
+        // because i'm using both Mac and Windows
+        expectedStart = expectedStart.ReplaceLineEndings(Environment.NewLine);
+        expectedEnd = expectedEnd.ReplaceLineEndings(Environment.NewLine);
+        
         var shapes = Day12.ParseInput(Sample).Shapes;
 
         var shape = shapes[index];
@@ -140,6 +148,10 @@ public sealed class Day12Tests
     [InlineData(5, "###\n.#.\n###", "###\n.#.\n###")]
     public void Can_horizontally_flip_shape(int index, string expectedStart, string expectedEnd)
     {
+        // because i'm using both Mac and Windows
+        expectedStart = expectedStart.ReplaceLineEndings(Environment.NewLine);
+        expectedEnd = expectedEnd.ReplaceLineEndings(Environment.NewLine);
+        
         var shapes = Day12.ParseInput(Sample).Shapes;
         
         var shape = shapes[index];
