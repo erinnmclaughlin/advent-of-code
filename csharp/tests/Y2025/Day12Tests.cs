@@ -1,8 +1,9 @@
+using AdventOfCode.Tests.Y2025.Common;
 using AdventOfCode.Y2025;
 
 namespace AdventOfCode.Tests.Y2025;
 
-public sealed class Day12Tests
+public sealed class Day12Tests(ITestOutputHelper outputHelper)
 {
     private readonly Day12 _solver = new();
 
@@ -225,5 +226,135 @@ public sealed class Day12Tests
         
         var numberOfOptions = bigShape.EnumerateAvailablePositions(shape).Distinct().Count();
         Assert.Equal(1, numberOfOptions);
+    }
+
+    [Fact]
+    public void TestSmallExample()
+    {
+        var (shapes, instructions) = Day12.ParseInput(Sample);
+        
+        var (bigShape, targets) = instructions[0];
+        
+        var pieces = targets
+            .Index()
+            .SelectMany(t => Enumerable.Range(0, t.Item).Select(_ => shapes[t.Index]))
+            .ToList();
+        
+        Assert.Equal(targets.Sum(), pieces.Count);
+
+        var found = false;
+        for (var i = 0; i < pieces.Count; i++)
+        {
+            var remaining = pieces.Index().Where(p => p.Index != i).Select(p => p.Item).ToList();
+            
+            foreach (var p in pieces[i].GetPermutations().Distinct())
+            {
+                if (FindShape(bigShape, p, [..remaining]))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (found) break;
+        }
+        
+        Assert.True(found);
+
+    }
+    
+    [Fact(Skip = "WIP")]
+    public void Test()
+    {
+        var (shapes, instructions) = Day12.ParseInput(Sample);
+
+        var solutionsFound = 0;
+        
+        foreach (var (bigShape, targets) in instructions)
+        {
+            var pieces = targets
+                .Index()
+                .SelectMany(t => Enumerable.Range(0, t.Item).Select(_ => shapes[t.Index]))
+                .ToList();
+
+            var found = false;
+            
+            foreach (var shape in FindAllPossibleShapes(bigShape, pieces).OrderBy(x => x.BoundingBox.GetArea()))
+            {
+                var output = new ShapeStringBuilder(outputHelper);
+                output.Add(shape, '#');
+                output.Dump();
+                outputHelper.WriteLine("");
+                            
+                found = true;
+                break;
+            }
+
+            if (found)
+                solutionsFound++;
+        }
+        
+        Assert.Equal(2, solutionsFound);
+    }
+    
+    private bool FindShape(Day12.LargeGridShape targetShape, Day12.SmallGridShape currentShape, List<Day12.SmallGridShape> remainingPieces)
+    {
+        if (remainingPieces.Count == 0)
+            return true;
+
+        var nextPiece = remainingPieces[0];
+
+        foreach (var p in nextPiece.GetOptionsWithPair(currentShape).OrderBy(p => p.BoundingBox.GetArea()))
+        {
+            if (targetShape.Width <= p.BoundingBox.Width &&
+                targetShape.Height <= p.BoundingBox.Height)
+            {
+                if (FindShape(targetShape, p, remainingPieces[1..]))
+                    return true;
+            }
+        }
+
+        var output = new ShapeStringBuilder(outputHelper);
+        outputHelper.WriteLine($"Failed to find shape for target width {targetShape.Width} and target height {targetShape.Height}. Stuck with {remainingPieces.Count} remaining pieces.");
+        output.Add(currentShape, '#');
+        output.Dump();
+        outputHelper.WriteLine("");
+        
+        return false;
+    }
+
+    private IEnumerable<Day12.SmallGridShape> FindAllPossibleShapes(
+        Day12.LargeGridShape bigShape,
+        List<Day12.SmallGridShape> pieces)
+    {
+        for (var i = 0; i < pieces.Count; i++)
+        {
+            var remaining = pieces.Index().Where(p => p.Index != i).Select(p => p.Item).ToList();
+            
+            foreach (var shape in FindAllPossibleShapes(bigShape, pieces[i], remaining).OrderBy(p => p.BoundingBox.GetArea()))
+                yield return shape;
+        }
+    }
+    
+    private IEnumerable<Day12.SmallGridShape> FindAllPossibleShapes(Day12.LargeGridShape bigShape, Day12.SmallGridShape current, List<Day12.SmallGridShape> remainingPieces)
+    {
+        if (remainingPieces.Count == 0)
+        {
+            yield return current;
+            yield break;
+        }
+
+        if (bigShape.Width < current.BoundingBox.Width || bigShape.Height < current.BoundingBox.Height)
+            yield break;
+
+        for (var i = 0; i < remainingPieces.Count; i++)
+        {
+            var nextRemaining = remainingPieces.Index().Where(p => p.Index != i).Select(p => p.Item).ToList();
+            foreach (var pair in current.GetOptionsWithPair(remainingPieces[i]).OrderBy(p => p.BoundingBox.GetArea()))
+            {
+                foreach (var shape in FindAllPossibleShapes(bigShape, pair, nextRemaining).OrderBy(p => p.BoundingBox.GetArea()))
+                    yield return shape;
+            }
+        }
     }
 }

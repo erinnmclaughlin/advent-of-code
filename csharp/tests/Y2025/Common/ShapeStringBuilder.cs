@@ -38,8 +38,7 @@ public sealed class ShapeStringBuilder(ITestOutputHelper output)
                     output.Write(".");
             }
 
-            if (row != bottom)
-                output.WriteLine("");
+            output.WriteLine("");
         }
     }
     

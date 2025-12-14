@@ -145,11 +145,23 @@ public sealed class Day12() : AdventDay(2025, 12)
         }
     }
     
-    public sealed class SmallGridShape(HashSet<GridCell> cells)
+    public sealed class SmallGridShape : IGridShape2D
     {
-        private readonly HashSet<GridCell> _cells = cells.OrderBy(c => c.Row).ThenBy(c => c.Col).ToHashSet();
+        public GridRectangle BoundingBox { get; }
+
+        private readonly HashSet<GridCell> _cells;
         public IReadOnlySet<GridCell> Cells => _cells;
 
+        public SmallGridShape(ICollection<GridCell> cells)
+        {
+            _cells = cells.OrderBy(c => c.Row).ThenBy(c => c.Col).ToHashSet();
+            
+            BoundingBox = new GridRectangle(
+                new GridCell(_cells.Min(c => c.Col), _cells.Min(c => c.Row)),
+                new GridCell(_cells.Max(c => c.Col), _cells.Max(c => c.Row))
+            );
+        }
+        
         public SmallGridShape GetFlippedVertical()
         {
             return new SmallGridShape(Cells.Select(c => new GridCell(2 - c.Col, c.Row)).ToHashSet());
@@ -190,6 +202,45 @@ public sealed class Day12() : AdventDay(2025, 12)
             return !Equals(left, right);
         }
 
+        public IEnumerable<SmallGridShape> GetOptionsWithPair(SmallGridShape other)
+        {
+            var offsetX = Cells.Max(c => c.Col) + 3;
+            var offsetY = Cells.Max(c => c.Row) + 3;
+            
+            foreach (var p1 in GetPermutations())
+            {
+                foreach (var p2 in other.GetPermutations())
+                {
+                    for (var rowOffset = 0; rowOffset <= offsetY; rowOffset++)
+                    {
+                        for (var colOffset = 0; colOffset <= offsetX; colOffset++)
+                        {
+                            var p2Cells = p2.Cells.Select(c => new GridCell(c.Col + colOffset, c.Row + rowOffset)).ToHashSet();
+
+                            if (p1.Cells.Any(c => p2Cells.Contains(c)))
+                                continue;
+
+                            yield return new SmallGridShape(p1.Cells.Concat(p2Cells).ToArray());
+                        }
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<SmallGridShape> GetPermutations()
+        {
+            var current = this;
+
+            for (var i = 0; i < 4; i++)
+            {
+                yield return current;
+                yield return current.GetFlippedHorizontal();
+                yield return current.GetFlippedVertical();
+                yield return current.GetFlippedHorizontal().GetFlippedVertical();
+                current = current.GetRotatedLeft();
+            }
+        }
+
         public override string ToString()
         {
             var sb = new StringBuilder();
@@ -206,6 +257,11 @@ public sealed class Day12() : AdventDay(2025, 12)
             }
             
             return sb.ToString().TrimEnd();
+        }
+        
+        public bool Contains(GridCell cell)
+        {
+            return Cells.Contains(cell);
         }
     }
 }
