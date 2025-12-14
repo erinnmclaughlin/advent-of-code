@@ -6,11 +6,19 @@ public sealed class Day12() : AdventDay(2025, 12)
 {
     public override AdventDaySolution Solve(string input)
     {
-        var lines = InputHelper.GetLines(input);
+        var fitCount = 0;
+        var (_, instructions) = ParseInput(input);
+        
+        foreach (var (bigShape, targets) in instructions)
+        {
+            var neededArea = targets.Sum() * 3L * 3L; // ...ugh
+            var actualArea = Math.BigMul(bigShape.Width, bigShape.Height);
 
-        // TODO: implement puzzle logic here
+            if (neededArea <= actualArea)
+                fitCount++;
+        }
 
-        return ("", "");
+        return (fitCount, "");
     }
 
     public static bool TryFit(LargeGridShape bigShape, SmallGridShape smallShape)
