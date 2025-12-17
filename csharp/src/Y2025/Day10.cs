@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Diagnostics;
-using System.Text;
 
 namespace AdventOfCode.Y2025;
 
@@ -26,25 +24,16 @@ public sealed class Day10() : AdventDay(2025, 10)
         var (part1, part2) = (0L, 0L);
         
         var stopwatch = new Stopwatch();
+        stopwatch.Start();
         
         foreach (var instruction in instructions)
         {
-            Console.WriteLine("Solving instruction: {0}", instruction);
-            
-            stopwatch.Start();
-            var nextPart1 = CountFewestStepsForIndicatorLight(instruction);
-            part1 += nextPart1;
-            stopwatch.Stop();
-            Console.WriteLine("Part 1: {0} (Time: {1})", nextPart1, stopwatch.Elapsed);
-            stopwatch.Reset();
-            
-            stopwatch.Start();
-            var nextPart2 = CountFewestStepsForJoltageMeter_WithRecursion(instruction);
-            part2 += nextPart2;
-            stopwatch.Stop();
-            Console.WriteLine("Part 2: {0} (Time: {1})", nextPart2, stopwatch.Elapsed);
-            stopwatch.Reset();
+            part1 += CountFewestStepsForIndicatorLight(instruction);
+            part2 += CountFewestStepsForJoltageMeter(instruction);
         }
+
+        stopwatch.Stop();
+        Console.WriteLine($"Puzzle solved in {stopwatch.ElapsedMilliseconds}ms");
         
         return (part1, part2);
     }
@@ -54,6 +43,7 @@ public sealed class Day10() : AdventDay(2025, 10)
         .Select(Instruction.Parse)
         .ToArray();
     
+    // Part 1:
     public static int CountFewestStepsForIndicatorLight(Instruction instruction)
     {
         var emptyState = new string('.', instruction.TargetIndicatorLight.Length);
@@ -63,7 +53,7 @@ public sealed class Day10() : AdventDay(2025, 10)
         {
             var nextButton = instruction.Buttons[current.NextButton];
             
-            var nextState = GetNextIndicatorLight(current.State, nextButton);
+            var nextState = string.Join("", current.State.Select((c, i) => nextButton.Contains(i) ? c == '.' ? '#' : '.' : c));
 
             if (nextState == instruction.TargetIndicatorLight)
                 return current.StepCount;
@@ -81,162 +71,149 @@ public sealed class Day10() : AdventDay(2025, 10)
         throw new InvalidOperationException("No solution found");
     }
     
-    private static string GetNextIndicatorLight(string current, int[] button)
-    {
-        var sb = new StringBuilder();
-
-        for (var i = 0; i < current.Length; i++)
-        {
-            if (button.Contains(i))
-                sb.Append(current[i] == '.' ? '#' : '.');
-            else
-                sb.Append(current[i]);
-        }
-
-        return sb.ToString();
-    }
-
-    public static long CountFewestStepsForJoltageMeter_WithRecursion(Instruction instruction)
-    {
-        var memory = new Dictionary<int, long>();
-        var best = long.MaxValue;
-        var prioritizedButtons = instruction.Buttons
-            .OrderBy(b => GetMaxPushes(b, instruction.JoltageRequirements))
-            .ToArray();
+    private static Queue<T> CreateQueue<T>(IEnumerable<T> items) => new(items);
+    
+    // Part 2:
+    // Input takes 10-15 seconds to solve with this approach
         
-        foreach (var button in prioritizedButtons)
+    // Strategy:
+    // When we reach the "target" state, each button will have been pushed either an odd number of times or an even
+    // number of times. We also know that the total number of buttons is relatively small (my puzzle input has max 13
+    // buttons). Since we know that the number of buttons is relatively small, we can test each combination without too
+    // much explosion.
+        
+    // Steps:
+    // First, we find all even/odd combinations. Then for each combination, we calculate the net effect of pushing the
+    // "odd" buttons 1 time, and the "even" buttons 0 times. After that, to maintain the same even/odd combination
+    // status, any additional button presses have to happen in pairs. And since every remaining button press has to be
+    // done twice, the joltage meter has to contain all even numbers to be a state that can possibly be reached. SO, we
+    // do the single-button press for odd buttons, and then test that the joltage meter is even. If not, move on.
+    // Otherwise, we know the rest of the answer must be "doubled". So to get the rest of the answer, we divide the
+    // joltage meter values by 2. At that point, we have a new target state, so we recurse.
+    private static int CountFewestStepsForJoltageMeter(Instruction instruction)
+    {
+        var cache = new Dictionary<int[], int>(IntArrayComparer.Instance);
+        return CountFewestStepsForJoltageMeter(instruction.Buttons, instruction.JoltageRequirements, cache);
+    }
+    
+    private static int CountFewestStepsForJoltageMeter(int[][] buttons, int[] target, Dictionary<int[], int> cache)
+    {
+        if (cache.TryGetValue(target, out var cached))
+            return cached;
+        
+        if (target.All(x => x == 0))
+            return 0;
+
+        var best = int.MaxValue;
+
+        foreach (var chosenIndexes in EnumerateAllButtonCombinations(buttons))
         {
-            var count = CountFewestStepsForJoltageMeter(
-                prioritizedButtons,
-                new PartTwoState(instruction.JoltageRequirements, button),
-                1,
-                ref best,
-                memory);
+            // calculate the net change to the target
+            var effect = GetEffect(buttons, chosenIndexes, target.Length);
+
+            // if the effect doesn't result in all even numbers for the next state, then it's not a possible solution
+            if (!Apply(effect, target, out var nextState))
+                continue;
+
+            var buttonPresses = chosenIndexes.Count;
+            var nextButtonPresses = CountFewestStepsForJoltageMeter(buttons, nextState, cache);
             
-            if (count != -1)
-                best = Math.Min(best, count);
+            if (nextButtonPresses == int.MaxValue)
+                continue;
+            
+            best = Math.Min(best, buttonPresses + 2 * nextButtonPresses);
         }
 
+        cache[target] = best;
         return best;
     }
     
-    private static long CountFewestStepsForJoltageMeter(
-        int[][] prioritizedButtons,
-        PartTwoState current,
-        long stepCount,
-        ref long knownBest, 
-        Dictionary<int, long> memory)
+    private static IEnumerable<List<int>> EnumerateAllButtonCombinations(int[][] buttons)
     {
-        if (stepCount > knownBest)
-            return -1;
+        var indices = Enumerable.Range(0, buttons.Length).ToArray();
 
-        if (memory.TryGetValue(current.Hash, out var count))
+        for (var k = 0; k <= buttons.Length; k++)
         {
-            return count == -1 ? -1 : stepCount + count + 1;
-        }
-        
-        var (canGet, isComplete) = TryGetNextJoltageMeter(current.NextButton, current.JoltageMeter, out var nextMeter);
-
-        if (!canGet)
-        {
-            memory[current.Hash] = -1;
-            return -1;
-        }
-
-        if (isComplete)
-        {
-            knownBest = stepCount;
-            memory[current.Hash] = stepCount;
-            return stepCount;
-        }
-        
-        stepCount++;
-
-        var min = -1L;
-
-        foreach (var button in prioritizedButtons)
-        {
-            var nextCount = CountFewestStepsForJoltageMeter(prioritizedButtons, new(nextMeter, button), stepCount, ref knownBest, memory);
-            if (min == -1 || nextCount < min)
-                min = nextCount;
-        }
-
-        memory[current.Hash] = min;
-        return min;
-    }
-    
-    public static int CountFewestStepsForJoltageMeter_WithQueue(Instruction instruction, HashSet<int>? seenStates = null)
-    {
-        seenStates ??= [];
-        var prioritizedButtons = instruction.Buttons.Index().OrderBy(bi => GetMaxPushes(bi.Item, instruction.JoltageRequirements)).Select(x => x.Item).ToArray();
-        var queue = CreateQueue(prioritizedButtons.Select(b => (State: new PartTwoState(instruction.JoltageRequirements, b), StepCount: 1)));
-        
-        while (queue.TryDequeue(out var current))
-        {
-            if (!seenStates.Add(current.State.Hash))
-                continue;
-            
-            var (canGet, isComplete) = TryGetNextJoltageMeter(current.State.NextButton, current.State.JoltageMeter, out var nextMeter);
-
-            if (!canGet)
+            // choose indexes to make "odd"
+            foreach (var chosenIndexes in EnumerateAllButtonCombinations(indices, k, 0, new List<int>(k)))
             {
-                continue;
-            }
-
-            if (isComplete)
-            {
-                return current.StepCount;
-            }
-
-            foreach (var b in prioritizedButtons)
-            {
-                queue.Enqueue((new PartTwoState(nextMeter, b), current.StepCount + 1));
+                yield return chosenIndexes;
             }
         }
-
-        return -1;
     }
     
-    private static int GetMaxPushes(int[] button, int[] joltages)
+    private static IEnumerable<List<int>> EnumerateAllButtonCombinations(
+        int[] buttonIndexes,
+        int numberToSelect,
+        int startIndex,
+        List<int> current)
     {
-        return button.Min(i => joltages[i]);
-    }
-    
-    private static (bool CanGet, bool IsComplete) TryGetNextJoltageMeter(int[] button, int[] current, out int[] next)
-    {
-        next = new int[current.Length];
-        var isComplete = true;
-
-        for (var i = 0; i < current.Length; i++)
+        if (numberToSelect == 0)
         {
-            next[i] = current[i] - (button.Contains(i) ? 1 : 0);
-
-            if (next[i] > 0)
-                isComplete = false;
-            
-            if (next[i] < 0)
-                return (false, false);
+            yield return current;
+            yield break;
         }
 
-        return (true, isComplete);
+        for (var i = startIndex; i <= buttonIndexes.Length - numberToSelect; i++)
+        {
+            current.Add(buttonIndexes[i]);
+
+            foreach (var combo in EnumerateAllButtonCombinations(buttonIndexes, numberToSelect - 1, i + 1, [..current]))
+                yield return combo;
+
+            current.RemoveAt(current.Count - 1);
+        }
     }
     
-    private static Queue<T> CreateQueue<T>(IEnumerable<T> items) => new(items);
-
-    private sealed class PartTwoState
+    private static int[] GetEffect(int[][] buttons, List<int> buttonIndexes, int targetLength)
     {
-        public int[] JoltageMeter { get; }
-        public int[] NextButton { get; }
-        public int Hash { get; }
+        var effect = new int[targetLength];
+
+        foreach (var i in buttonIndexes)
+        foreach (var counter in buttons[i])
+            effect[counter]++;
+
+        return effect;
+    }
+
+    private static bool Apply(int[] effect, int[] target, out int[] nextState)
+    {
+        nextState = new int[target.Length];
         
-        public PartTwoState(int[] joltageMeter, int[] nextButton)
+        for (var i = 0; i < effect.Length; i++)
         {
-            JoltageMeter = joltageMeter;
-            NextButton = nextButton;
-            Hash = HashCode.Combine(
-                StructuralComparisons.StructuralEqualityComparer.GetHashCode(nextButton),
-                StructuralComparisons.StructuralEqualityComparer.GetHashCode(joltageMeter)
-            );
+            var diff = target[i] - effect[i];
+            if (diff < 0 || diff % 2 != 0)
+                return false;
+
+            nextState[i] = diff / 2;
+        }
+
+        return true;
+    }
+    
+    public sealed class IntArrayComparer : IEqualityComparer<int[]>
+    {
+        public static IntArrayComparer Instance { get; } = new();
+        
+        private IntArrayComparer() { }
+        
+        public bool Equals(int[]? x, int[]? y)
+        {
+            if (ReferenceEquals(x, y)) return true;
+            if (ReferenceEquals(x, null)) return false;
+            if (ReferenceEquals(y, null)) return false;
+       
+            return x.Length == y.Length && x.AsSpan().SequenceEqual(y.AsSpan());
+        }
+
+        public int GetHashCode(int[] obj)
+        {
+            var hc = new HashCode();
+            hc.Add(obj.Length);
+            foreach (var i in obj)
+                hc.Add(i);
+            return hc.ToHashCode();
         }
     }
 }
