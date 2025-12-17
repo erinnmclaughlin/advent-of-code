@@ -1,8 +1,6 @@
-using System.Text;
-
 namespace AdventOfCode.Y2025.Common;
 
-public sealed record GridShape : IGridShape2D
+public sealed record GridShape
 {
     private readonly HashSet<GridRectangle> _innerRectangles;
     
@@ -60,24 +58,7 @@ public sealed record GridShape : IGridShape2D
 
         return new GridShape(edges);
     }
-
-    public override string ToString()
-    {
-        var sb = new StringBuilder();
-        
-        for (var row = BoundingBox.Top; row <= BoundingBox.Bottom; row++)
-        {
-            for (var col = BoundingBox.Left; col <= BoundingBox.Right; col++)
-            {
-                sb.Append(Contains(new GridCell(col, row)) ? '#' : '.');
-            }
-            
-            sb.AppendLine();
-        }
-
-        return sb.ToString().TrimEnd();
-    }
-
+    
     private IEnumerable<GridRectangle> EnumerateInnerRectangles()
     {
         var horizontalEdges = Edges.Where(e => e.Height == 1).ToArray();

@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode.Common;
 
-public sealed record GridRectangle : IGridShape2D
+public sealed record GridRectangle
 {
     public int Top => TopLeft.Row;
     public int Right => TopRight.Col;
@@ -14,8 +14,6 @@ public sealed record GridRectangle : IGridShape2D
     public GridCell TopRight { get; }
     public GridCell BottomLeft { get; }
     public GridCell BottomRight { get; }
-
-    public GridRectangle BoundingBox => this;
 
     public GridRectangle(GridCell c1, GridCell c2)
     {
